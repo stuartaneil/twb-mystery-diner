@@ -918,8 +918,21 @@ function prepPdf(){
   pdfBuilding=true; setBtns(true,"Preparing your PDF…","Preparing your PDF…"); msg.hidden=true;
   buildPdf().then(function(b){ if(my!==pdfGen) return; pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); },function(e){ if(my!==pdfGen) return; fail("Couldn’t build the PDF on this phone. Use Open email app for the text and attach the photos from the gallery below."); });
 }
+var ENDPOINT="https://script.google.com/macros/s/AKfycbwDMxRuwxcIoUS3ZrjnSQNhixxXj12j_G2X-Ud3RcT1MDsGVadzDzslDNEQsIu9Se_8/exec", SECRET="twb-md-2026-surfers";
+function emailText(){ return subject()+"\n\nFull report with every photo attached as PDF.\n\nAT A GLANCE\n"+glanceText()+"\n\nSent from the Third Wave BBQ mystery diner form."; }
+function sentOK(){ var b=$("#sendbtn"); if(b){ b.disabled=false; b.textContent="Sent — send again?"; } try{ localStorage.setItem(skey()+":sent",String(Date.now())); }catch(e){} setSendNote("Sent. Your report and photos are with Third Wave BBQ — nothing else to do. Thank you."); toast("Sent."); }
+function sendDirect(){
+  var b=$("#sendbtn"); b.disabled=true; b.textContent="Sending…"; setSendNote("");
+  blobToDataURL(pdfBlob).then(function(d){
+    var payload=JSON.stringify({secret:SECRET,code:CODE,filename:pdfName(),subject:subject(),text:emailText(),pdf:d.split(",")[1]});
+    return fetch(ENDPOINT,{method:"POST",redirect:"follow",headers:{"Content-Type":"text/plain;charset=utf-8"},body:payload});
+  }).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(function(j){ if(!j||!j.ok) throw new Error((j&&j.error)||"not accepted"); sentOK(); })
+  .catch(function(e){ b.disabled=false; b.textContent="Send the report ("+mb(pdfBlob)+")"; setSendNote("Couldn’t send from here ("+(e&&e.message?e.message:"no connection")+"). Check your signal and tap Send the report again."); toast("Not sent — try again."); });
+}
 function sendReport(){
   if(!pdfBlob){ prepPdf(); toast("Still preparing the PDF — one moment."); return; }
+  if(ENDPOINT){ sendDirect(); return; }
   var name=pdfName(), file=null;
   try{ file=new File([pdfBlob],name,{type:"application/pdf"}); }catch(e){}
   if(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
