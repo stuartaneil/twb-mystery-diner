@@ -909,15 +909,17 @@ function prepPdf(){
   function setBtns(dis,t1,t2){ b1.disabled=dis; b1.textContent=t1; if(b2){ b2.disabled=dis; b2.textContent=t2; } }
   function fail(t){ pdfBuilding=false; b1.hidden=true; if(b2) b2.hidden=true; msg.hidden=false; msg.textContent=t; openAlt(); }
   if(!(window.jspdf&&window.jspdf.jsPDF)){ fail("The PDF maker didn’t load on this connection. Use Open email app for the text and attach the photos from the gallery below."); return; }
-  if(pdfBlob){ setBtns(false,"Send the report ("+mb(pdfBlob)+")","Save the PDF ("+mb(pdfBlob)+")"); return; }
+  if(pdfBlob){ setBtns(false,"Send the report ("+mb(pdfBlob)+")","Save the PDF ("+mb(pdfBlob)+")"); if(sentAt()) showSent(); return; }
   if(pdfBuilding) return;
   var my=++pdfGen;
   pdfBuilding=true; setBtns(true,"Preparing your PDF…","Preparing your PDF…"); msg.hidden=true;
-  buildPdf().then(function(b){ if(my!==pdfGen) return; pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); },function(e){ if(my!==pdfGen) return; fail("Couldn’t build the PDF on this phone. Use Open email app for the text and attach the photos from the gallery below."); });
+  buildPdf().then(function(b){ if(my!==pdfGen) return; pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); if(sentAt()) showSent(); },function(e){ if(my!==pdfGen) return; fail("Couldn’t build the PDF on this phone. Use the email option below instead."); });
 }
 var ENDPOINT="https://script.google.com/macros/s/AKfycbwDMxRuwxcIoUS3ZrjnSQNhixxXj12j_G2X-Ud3RcT1MDsGVadzDzslDNEQsIu9Se_8/exec", SECRET="twb-md-2026-surfers";
 function emailText(){ return subject()+"\n\nFull report with every photo attached as PDF.\n\nAT A GLANCE\n"+glanceText()+"\n\nSent from the Third Wave BBQ mystery diner form."; }
-function sentOK(){ var b=$("#sendbtn"); if(b){ b.disabled=false; b.textContent="Sent — send again?"; } try{ localStorage.setItem(skey()+":sent",String(Date.now())); }catch(e){} setSendNote("Sent. Your report and photos are with Third Wave BBQ — nothing else to do. Thank you."); toast("Sent."); }
+function sentAt(){ try{ return +localStorage.getItem(skey()+":sent")||0; }catch(e){ return 0; } }
+function showSent(){ var b=$("#sendbtn"); if(b){ b.disabled=true; b.hidden=false; b.textContent="Sent"; } var t=sentAt(); setSendNote("Sent"+(t?" "+whenText(t):"")+". Your report and photos are with Third Wave BBQ — nothing else to do. Thank you."); }
+function sentOK(){ try{ localStorage.setItem(skey()+":sent",String(Date.now())); }catch(e){} showSent(); toast("Sent."); }
 function sendDirect(){
   var b=$("#sendbtn"); b.disabled=true; b.textContent="Sending…"; setSendNote("");
   blobToDataURL(pdfBlob).then(function(d){
