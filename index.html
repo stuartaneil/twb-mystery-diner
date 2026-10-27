@@ -135,6 +135,7 @@ input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px soli
 .gal img{display:block;width:100%;border-radius:4px}
 .gal figcaption{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.3}
 .lnk{background:none;border:0;color:var(--red);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.lnk.inv{color:var(--bg)}
 
 .rules{list-style:none;padding:0;margin:0 0 10px}
 .rules li{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;font-size:16px;line-height:1.35;border-bottom:1px solid var(--line)}
@@ -386,14 +387,23 @@ function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).
 function skey(){ return KEY+":"+CODE; }
 var pdfGen=0;
 function invalidatePdf(){ pdfBlob=null; pdfBuilding=false; pdfGen++; }
-var storageOK=true, loadedAt=0, stateT=null, INAPP=/FBAN|FBAV|Instagram|Line\/|Messenger|Twitter|TikTok|Snapchat|Slack|Teams|MicroMessenger|GSA\//i.test(navigator.userAgent);
+var UA=navigator.userAgent, isIOS=/iPhone|iPad|iPod/.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+var INAPP=/FBAN|FBAV|Instagram|Line\/|Messenger|Twitter|TikTok|Snapchat|Slack|Teams|MicroMessenger|GSA\/|Outlook|LinkedIn|Pinterest/i.test(UA)||(isIOS&&!/Safari\//.test(UA))||/; wv\)/.test(UA)||/[?&]inapp=1/.test(location.search);
+var storageOK=true, loadedAt=0, stateT=null;
+function b64e(s){ return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function b64d(s){ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; return decodeURIComponent(escape(atob(s))); }
+function hashState(){ try{ var m=/(?:^#|[#&])s=([A-Za-z0-9_-]+)/.exec(location.hash||""); if(!m) return null; var o=JSON.parse(b64d(m[1])); return (o&&o.S)?o:null; }catch(e){ return null; } }
+function putHash(){ try{ var h="#s="+b64e(JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now(),code:CODE})); if(h.length<60000) history.replaceState(null,"",location.pathname+location.search+h); }catch(e){} }
+function currentLink(){ return location.protocol+"//"+location.host+location.pathname+location.search+location.hash; }
+function inAppBar(){ var el=$("#st"); if(!el) return; el.hidden=false; el.classList.add("bad"); el.innerHTML='<b>Your answers won’t survive closing this app’s browser.</b> Open this page in '+(isIOS?'Safari':'Chrome')+' first — <button type="button" class="lnk inv" id="openSafari">open it there now</button>'; }
+function openInBrowser(){ putHash(); var u=currentLink(); copy(u).then(function(ok){ toast(ok?"Link copied — paste it into "+(isIOS?"Safari":"Chrome")+" if it didn’t open by itself.":"Copy this page’s link into "+(isIOS?"Safari":"Chrome")+"."); }); if(isIOS){ try{ setTimeout(function(){ location.href="x-safari-"+u; },150); }catch(e){} } }
 function probeStorage(){ try{ localStorage.setItem(KEY+":probe","1"); localStorage.removeItem(KEY+":probe"); storageOK=true; }catch(e){ storageOK=false; } try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(){},function(){}); } }catch(e){} }
 function setStatus(t,bad){ var el=$("#st"); if(!el) return; el.hidden=!t; el.textContent=t||""; el.classList.toggle("bad",!!bad); }
 function whenText(ts){ return ts?new Date(ts).toLocaleString("en-AU",{weekday:"short",hour:"numeric",minute:"2-digit"}):""; }
 function bootStatus(){
   var n=Object.keys(S).length;
   if(!storageOK){ setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true); return; }
-  if(INAPP){ setStatus("You’re inside another app’s browser — open this link in Safari or Chrome so your answers stay saved.",true); }
+  if(INAPP){ inAppBar(); }
   else if(n){ setStatus("Saved on this phone"+(loadedAt?" · "+whenText(loadedAt):""),false); }
   else { setStatus("Answers save to this browser as you type",false); }
   if(n&&!bootStatus.done){ bootStatus.done=true; toast("Welcome back — your answers from "+(whenText(loadedAt)||"earlier")+" are still here."); }
@@ -405,6 +415,8 @@ function issued(code){ if(!ISSUED.length) return Promise.resolve(true); return s
 
 function load(){
   try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
+  var hs=hashState();
+  if(hs&&hs.code===CODE&&(hs.at||0)>loadedAt){ S=hs.S||{}; cur=hs.cur||cur; loadedAt=hs.at||0; if(hs.shown){ shown.p=hs.shown.p||4; shown.f=hs.shown.f||4; } }
 }
 function save(){ invalidatePdf(); persist(); }
 function persist(){
@@ -412,7 +424,8 @@ function persist(){
   saveT=setTimeout(function(){
     var ok=false;
     try{ localStorage.setItem(skey(),JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now()})); ok=true; }catch(e){}
-    if(ok) setSaved(); else setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true);
+    if(ok) setSaved(); else if(!INAPP) setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true);
+    putHash();
     clearTimeout(stateT); stateT=setTimeout(function(){ idbPut({k:"state:"+CODE,S:S,cur:cur,shown:shown,at:Date.now()}).then(function(){},function(){}); },800);
     refresh();
   },120);
@@ -581,7 +594,7 @@ function renderSection(s,idx){
   h+='<h1 class="h1">'+(s.num?'<b>'+s.num+'</b>':'')+esc(s.title)+'</h1>';
   if(s.lead) h+='<div class="lead">'+esc(s.lead)+'</div>';
   h+='<div class="rule"></div>';
-  if(s.id==="start") h+='<div class="dn"><span class="lab">Your diner number</span><b>'+esc(CODE)+'</b><p class="note">This number is yours alone — it ties your report to you, so please don’t pass the link on. It’s printed on your report and on every photo.</p><p class="note">Your answers save in this browser as you type. Keep using the same browser on this phone — not a private tab — and they’ll be here when you come back.</p></div>';
+  if(s.id==="start") h+='<div class="dn"><span class="lab">Your diner number</span><b>'+esc(CODE)+'</b><p class="note">This number is yours alone — it ties your report to you, so please don’t pass the link on. It’s printed on your report and on every photo.</p><p class="note">Your answers save in this browser as you type. Keep using the same browser on this phone — not a private tab — and they’ll be here when you come back. If this opened inside another app (Outlook, Slack, Teams), open it in '+(isIOS?'Safari':'Chrome')+' before you start.</p></div>';
   if(s.send){ h+=sendHTML(); }
   else { s.groups.forEach(function(g){ h+='<div class="g"><div class="gh"><h2>'+esc(g.h)+(g.r?' <b>'+esc(g.r)+'</b>':'')+'</h2>'+(g.note?'<div class="note-r">'+esc(g.note)+'</div>':'')+'</div>'+g.fields.map(function(f){ return render(f,""); }).join("")+'</div>'; }); }
   h+='<div class="nav">'+(idx>0?'<button type="button" class="btn" data-go="'+SECTIONS[idx-1].id+'">← '+esc(SECTIONS[idx-1].tab)+'</button>':'')+(idx<SECTIONS.length-1?'<button type="button" class="btn solid" data-go="'+SECTIONS[idx+1].id+'">'+esc(SECTIONS[idx+1].tab)+' →</button>':'')+'</div>';
@@ -895,8 +908,9 @@ document.addEventListener("click",function(e){
     else { r.checked=true; S[r.dataset.id]=r.value; $$('input[name="'+r.name+'"]').forEach(function(x){ x.closest("label").classList.toggle("on",x.checked); }); }
     save(); return;
   }
-  var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn");
+  var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn,#openSafari");
   if(!b) return;
+  if(b.id==="openSafari"){ openInBrowser(); return; }
   if(b.dataset.now){
     var inp=$('[data-id="'+b.dataset.now+'"]'); var d=new Date();
     var v=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
