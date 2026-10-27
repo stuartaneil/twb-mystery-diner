@@ -214,11 +214,10 @@ var RULES=[
  "Please take every photo the form asks for — discreetly, no flash. Each section has its own photo spots.",
  "Jot down times and exact words as they happen — opinions can wait for the pages that ask.",
  "Please order broadly: a platter or tray, sides, dessert and a couple of rounds of drinks.",
- "If you can, visit the toilets twice — once early, once before you leave.",
  "Please send everything back within 24 hours, while it’s fresh."
 ];
 var CLOCK=[{m:"Drinks order taken"},{m:"Drinks on the table"},{m:"Food order taken"},{m:"Starters on the table"},{m:"Mains on the table"},{m:"Check-back on the food",yn:1},{m:"Dessert offered",yn:1},{m:"Paid and out the door"}];
-var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, caddies and menus","Bar and drinks area","The pass and kitchen sightline","Toilets — early visit","Toilets — before leaving"];
+var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, caddies and menus","Bar and drinks area","The pass and kitchen sightline"];
 var REPMAX={p:8,f:3}, REPDEF={p:4,f:3}, DISHES=["Starters","Mains","Dessert"];
 function repTitle(f,i){ return f.titles?f.titles[i]:f.title+" "+(i+1); }
 
@@ -242,22 +241,13 @@ var SECTIONS=[
  ]}
 ]},
 {id:"online",tab:"01 Online",num:"01",title:"BEFORE YOU GO — ONLINE",groups:[
- {h:"GOOGLE",fields:[
-  {t:"num",id:"o_stars",label:"Star rating showing today",suf:"/ 5",mode:"decimal"},
-  {t:"area",id:"o_complaint",label:"Please read the five newest reviews. The complaint that keeps coming up:",q:1},
-  {t:"area",id:"o_praise",label:"The praise that keeps coming up:",q:1}
- ]},
  {h:"WEBSITE",fields:[
   {t:"checks",items:[["o_w_search","Found it on the first search"],["o_w_hours","Opening hours easy to find"],["o_w_menu","Menu with prices"],["o_w_booking","Online booking worked"]]},
   {t:"area",id:"o_w_broken",label:"Anything out of date or broken:",q:1}
  ]},
  {h:"INSTAGRAM",fields:[
-  {t:"date",id:"o_ig_date",label:"Date of the most recent post"},
   {t:"rate",id:"o_ig_hungry",label:"The food photos make you hungry"},
   {t:"rate",id:"o_ig_pick",label:"Looks like a place you would pick yourself"}
- ]},
- {h:"THE",r:"PROMISE",fields:[
-  {t:"area",id:"o_promise",label:"After all of the above — what are you expecting this venue to be like? You’ll answer against this on the Verdict page (07).",q:1}
  ]},
  {h:"IF YOU BOOKED",fields:[
   {t:"checks",items:[["o_b_fast","Done in under two minutes"],["o_b_conf","Confirmation arrived"],["o_b_details","Details right on arrival — name, party size"],["o_b_occasion","Asked about the occasion or seating"]]}
@@ -281,19 +271,12 @@ var SECTIONS=[
  ]}
 ]},
 {id:"inside",tab:"03 Inside",num:"03",title:"INSIDE THE VENUE",groups:[
- {h:"ZONE BY ZONE",note:"Photos — dining room · your table · toilets",fields:[
+ {h:"ZONE BY ZONE",note:"Photos — dining room · your table",fields:[
   {t:"zones",id:"z",items:ZONES}
  ]},
  {h:"PHOTOS",r:"INSIDE",note:"Discreetly — no flash",fields:[
   {t:"photo",id:"ph_room",label:"Dining room, wide",max:3},
-  {t:"photo",id:"ph_table",label:"Your table setting",max:2},
-  {t:"photo",id:"ph_toilets",label:"Toilets",max:4}
- ]},
- {h:"TOILETS, CLOSE UP",fields:[
-  {t:"yn",id:"t_stock",label:"Paper, soap and towel stocked"},
-  {t:"yn",id:"t_smell",label:"Smells clean"},
-  {t:"yn",id:"t_bin",label:"Bin not overflowing"},
-  {t:"yn",id:"t_flush",label:"Everything flushes and runs hot"}
+  {t:"photo",id:"ph_table",label:"Your table setting",max:2}
  ]},
  {h:"COMFORT",fields:[
   {t:"single",id:"c_music",label:"Music",opts:["Fits the room","Too loud to talk","None playing"]},
@@ -371,8 +354,7 @@ var SECTIONS=[
   {t:"rate",id:"a_evening",label:"As a place to spend an evening"}
  ]},
  {h:"THE PROMISE,",r:"KEPT?",fields:[
-  {t:"recall",from:"o_promise",label:"What you expected, from the Online page (01)"},
-  {t:"single",id:"pr_kept",label:"The visit was:",q:1,opts:["Better","As promised","Worse"]},
+  {t:"single",id:"pr_kept",label:"Compared with what the website and Instagram led you to expect, the visit was:",q:1,opts:["Better","As expected","Worse"]},
   {t:"area",id:"pr_diff",label:"What was different:",q:1}
  ]},
  {h:"THE VERDICT",fields:[
