@@ -222,6 +222,7 @@ var CLOCK=[{m:"Drinks order taken"},{m:"Drinks on the table"},{m:"Food order tak
 var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, caddies and menus","Bar and drinks area","The pass and kitchen sightline"];
 var REPMAX={p:8,f:3}, REPDEF={p:4,f:3}, DISHES=["Starters","Mains","Dessert"];
 function repTitle(f,i){ return f.titles?f.titles[i]:f.title+" "+(i+1); }
+function cardFields(f,i){ return f.fields.filter(function(sf){ return !(sf.not&&sf.not.indexOf(i)>=0); }); }
 
 var SECTIONS=[
 {id:"start",tab:"Start",title:"MYSTERY DINER REPORT",lead:"Gold Coast · Surfers Paradise · Confidential",groups:[
@@ -319,7 +320,8 @@ var SECTIONS=[
   {t:"repeat",id:"f",title:"Dish",titles:["Starters","Mains","Dessert"],fixed:1,fields:[
    {t:"text",id:"name",label:"What you had"},
    {t:"photo",id:"ph",label:"This plate, top-down, as it lands",max:2},
-   {t:"checks",items:[["hot","Hot when it landed"],["photo","Looked like the menu photo"]]},
+   {t:"checks",items:[["hot","Hot when it landed"]],not:[2]},
+   {t:"checks",items:[["photo","Looked like the menu photo"]]},
    {t:"rate",id:"taste",label:"Taste"},
    {t:"rate",id:"portion",label:"Portion"},
    {t:"checks",items:[["again","Would order it again"]]},
@@ -538,7 +540,7 @@ function fSingle(f,id){ return '<div class="f">'+(f.label?'<span class="lab'+(f.
 function fRate(f,id){ var n=f.max||5, h=''; for(var v=1;v<=n;v++){ h+='<label><input type="radio" name="'+id+'" value="'+v+'" data-id="'+id+'">'+v+'</label>'; } return '<div class="rl"><span class="q">'+esc(f.label)+'</span><div class="rate">'+h+'</div></div>'; }
 function fZones(f){ return f.items.map(function(z,i){ var b=f.id+i+"_"; return '<div class="card"><div class="ct">'+esc(z)+'</div>'+fRate({label:"Clean"},b+"clean")+fRate({label:"Condition"},b+"cond")+fText({label:"What let it down"},b+"note")+'</div>'; }).join(""); }
 function fClock(f){ return f.items.map(function(it,i){ var b=f.id+i+"_"; if(it.yn){ return '<div class="mo"><div class="yn"><span class="q">'+esc(it.m)+'</span><div class="chips">'+["Yes","No"].map(function(o){ return '<label class="chip"><input type="radio" name="'+b+'y" value="'+o+'" data-id="'+b+'y">'+o+'</label>'; }).join("")+'</div></div></div>'; } return '<div class="mo"><div class="ml"><span>'+esc(it.m)+'</span></div><div class="mr"><input type="time" data-id="'+b+'t" aria-label="'+esc(it.m)+' time"><button type="button" class="now" data-now="'+b+'t">Now</button><input type="text" data-id="'+b+'n" placeholder="Note" aria-label="'+esc(it.m)+' note" autocomplete="off"></div></div>'; }).join(""); }
-function fRepeat(f){ var h=''; for(var i=0;i<REPMAX[f.id];i++){ var b=f.id+i+"_"; h+='<div class="card rep" data-rep="'+f.id+'" data-i="'+i+'"><div class="ct">'+esc(repTitle(f,i))+'</div>'+f.fields.map(function(sf){ return render(sf,b); }).join("")+'</div>'; } return h+(f.fixed?'':'<button type="button" class="btn small" data-add="'+f.id+'">+ '+esc(f.add)+'</button>'); }
+function fRepeat(f){ var h=''; for(var i=0;i<REPMAX[f.id];i++){ var b=f.id+i+"_"; h+='<div class="card rep" data-rep="'+f.id+'" data-i="'+i+'"><div class="ct">'+esc(repTitle(f,i))+'</div>'+cardFields(f,i).map(function(sf){ return render(sf,b); }).join("")+'</div>'; } return h+(f.fixed?'':'<button type="button" class="btn small" data-add="'+f.id+'">+ '+esc(f.add)+'</button>'); }
 function fWords(f,id){ return '<div class="f"><span class="lab'+(f.q?' q':'')+'">'+esc(f.label)+'</span><div class="row3">'+[1,2,3].map(function(n){ return '<input type="text" data-id="'+id+n+'" aria-label="Word '+n+'" autocomplete="off" autocapitalize="none">'; }).join("")+'</div></div>'; }
 function fRecall(f){ return '<div class="f"><span class="lab">'+esc(f.label)+'</span><div class="recall" data-recall="'+f.from+'"></div></div>'; }
 function fPhoto(f,id){
@@ -701,7 +703,7 @@ function rep(f,pfx,L){
     case "repeat":
       for(var i=0;i<shown[f.id];i++){
         var b=f.id+i+"_"; if(!repHas(f,b)) continue;
-        var sub=[]; f.fields.forEach(function(sf){ rep(sf,b,sub); });
+        var sub=[]; cardFields(f,i).forEach(function(sf){ rep(sf,b,sub); });
         L.push(repTitle(f,i)+":"); sub.forEach(function(x){ L.push("    "+x); });
       }
       break;
@@ -755,7 +757,7 @@ function ynAll(){
     else if(f.t==="yn"){ push(sec,prefix+f.label,sval(pfx+f.id)); }
     else if(f.t==="clock"){ f.items.forEach(function(it,i){ if(it.yn) push(sec,it.m,sval(f.id+i+"_y")); }); }
     else if(f.t==="row"){ f.fields.forEach(function(x){ walk(x,pfx,sec,prefix); }); }
-    else if(f.t==="repeat"){ for(var r=0;r<shown[f.id];r++){ var bp=f.id+r+"_"; f.fields.forEach(function(sf){ walk(sf,bp,sec,repTitle(f,r)+": "); }); } }
+    else if(f.t==="repeat"){ for(var r=0;r<shown[f.id];r++){ var bp=f.id+r+"_"; cardFields(f,r).forEach(function(sf){ walk(sf,bp,sec,repTitle(f,r)+": "); }); } }
   }
   SECTIONS.forEach(function(s){ if(s.send) return; s.groups.forEach(function(g){ g.fields.forEach(function(f){ walk(f,"",s.tab,""); }); }); });
   return yn;
@@ -870,7 +872,7 @@ function buildPdf(){
       case "clock": f.items.forEach(function(it,i){ var b=f.id+i+"_"; if(it.yn){ ynRow(it.m,sval(b+"y")); } else { trow(it.m+(sval(b+"n")?"  —  "+sval(b+"n"):""),sval(b+"t")); } }); break;
       case "repeat":
         ch=Promise.resolve();
-        for(var r=0;r<shown[f.id];r++){ (function(r){ var bp=f.id+r+"_"; if(!repHas(f,bp)) return; ch=ch.then(function(){ grp(repTitle(f,r)); var c2=Promise.resolve(); f.fields.forEach(function(sf){ c2=c2.then(function(){ return pf(sf,bp); }); }); return c2; }); })(r); }
+        for(var r=0;r<shown[f.id];r++){ (function(r){ var bp=f.id+r+"_"; if(!repHas(f,bp)) return; ch=ch.then(function(){ grp(repTitle(f,r)); var c2=Promise.resolve(); cardFields(f,r).forEach(function(sf){ c2=c2.then(function(){ return pf(sf,bp); }); }); return c2; }); })(r); }
         return ch;
       case "photo": return photos(id,slotLabel(id));
     }
