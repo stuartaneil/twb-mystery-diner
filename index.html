@@ -631,9 +631,10 @@ function build(){
   if(SECTIONS.some(function(s){ return s.id===hsh; })) cur=hsh;
   show(cur,true);
   bootStatus();
+  if(Object.keys(S).length) persist();
   idbAll().then(function(recs){
     var bk=(recs||[]).filter(function(r){ return r.k==="state:"+CODE; })[0];
-    if(bk&&bk.S&&Object.keys(S).length===0&&Object.keys(bk.S).length){ S=bk.S; cur=bk.cur||cur; loadedAt=bk.at||0; if(bk.shown){ shown.p=bk.shown.p||4; shown.f=Math.min(3,bk.shown.f||3); } restore(); show(cur,true); bootStatus(); }
+    if(bk&&bk.S&&Object.keys(S).length===0&&Object.keys(bk.S).length){ S=bk.S; cur=bk.cur||cur; loadedAt=bk.at||0; if(bk.shown){ shown.p=bk.shown.p||4; shown.f=Math.min(3,bk.shown.f||3); } restore(); show(cur,true); bootStatus(); persist(); }
     (recs||[]).sort(function(a,b){ return a.at-b.at; }).forEach(function(r){ if(!SLOTMETA[r.slot]||r.code!==CODE) return; (P[r.slot]=P[r.slot]||[]).push(r); var m=/^f(\d+)_ph$/.exec(r.slot); if(m) shown.f=Math.min(REPMAX.f,Math.max(shown.f,+m[1]+1)); });
     restoreReps(); renderAllSlots(); refresh(); invalidatePdf(); DBOK=true; diag(); if(cur==="verdict") renderPcl(); if(cur==="send") buildSend();
   },function(){ DBOK=false; diag(); toast("Photos can’t be stored on this phone in this browser — they will still go into the PDF while the page stays open"); });
