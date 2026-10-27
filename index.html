@@ -219,7 +219,7 @@ var RULES=[
  "Please send everything back within 24 hours, while it’s fresh."
 ];
 var CLOCK=[{m:"Drinks order taken"},{m:"Drinks on the table"},{m:"Food order taken"},{m:"Starters on the table"},{m:"Mains on the table"},{m:"Check-back on the food",yn:1},{m:"Dessert offered",yn:1},{m:"Paid and out the door"}];
-var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, caddies and menus","Bar and drinks area","The pass and kitchen sightline"];
+var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, glassware and menus","Bar and drinks area","The pass and kitchen sightline"];
 var REPMAX={p:8,f:3}, REPDEF={p:4,f:3}, DISHES=["Starters","Mains","Dessert"];
 function repTitle(f,i){ return f.titles?f.titles[i]:f.title+" "+(i+1); }
 function cardFields(f,i){ return f.fields.filter(function(sf){ return !(sf.not&&sf.not.indexOf(i)>=0); }); }
