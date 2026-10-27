@@ -397,7 +397,7 @@ function bootStatus(){
   if(n&&!bootStatus.done){ bootStatus.done=true; toast("Welcome back — your answers from "+(whenText(loadedAt)||"earlier")+" are still here."); }
 }
 function renderGate(notListed){ $("#strip").hidden=true; $("#main").innerHTML='<section class="gate"><h1 class="h1">'+(notListed?'THAT DINER NUMBER ISN’T <b>ON OUR LIST</b>':'THIS FORM OPENS FROM YOUR <b>PERSONAL LINK</b>')+'</h1><div class="rule"></div><p class="note">'+(notListed?'Please use the exact link you were sent — every diner has their own.':'Every mystery diner gets their own link with a diner number in it. Please open the exact link you were sent.')+'</p><p class="note">If it isn’t working, email <span class="addr">'+TO+'</span> and we’ll sort it out.</p></section>'; }
-var ISSUED=["5c2941f2575cf2f6","388fb2bf808e85e5","8f90c9d20f6a189a","36eb96b8f19c1bdf","572f600c44425731","373914b39514ddba","a82faaf0d4616814","4ab4478a2910693f","bb77ee32a88af6a5","a987041e0b2c74c5","24cc18aebfe73381","f94657047e81f9f6","362affa9bda0bd8e","3ad0175c11297e8b","6564fd3f70223985","6bc206948324f2c9","a27ca55886b755af","7935c22c92c98995","381aa68fbce5a5a0","4cd7a243cb6c91cb","8701f782d0a02907","42b6d280c7a9aa00","b39136a1922cdce0","4634d78449eae430","95e6df5ecca555df","626a6ae7b35b68c9","400e90ddf0fa3f07","496f3800253ef260","e249090fbd863778","65cba3fc8192920d","e5db8e62ecac5e5c","4dad9a061f28342f","72cf5231f370bae2","3b4756762b625968","89ca62027a0bab3d","0fe59d4b9138aedb","a99a760144fa74da","93d97b8e423eb1be","995f342d1292637f","21685890eadf4653","bf7b2138c866781a","3e9c7358959904ad","800b2112407bb402","a17220d10fdd8199","f9f871010329ae35","905d37f641e54c7e","3f435acdb99f8bfc","8446300e226ef788","a5963a5f43ddccbc","867e5543c1019bef"];
+var ISSUED=["388fb2bf808e85e5","8f90c9d20f6a189a","36eb96b8f19c1bdf","572f600c44425731","373914b39514ddba","a82faaf0d4616814","4ab4478a2910693f","bb77ee32a88af6a5","a987041e0b2c74c5","24cc18aebfe73381","f94657047e81f9f6","362affa9bda0bd8e","3ad0175c11297e8b","6564fd3f70223985","6bc206948324f2c9","a27ca55886b755af","7935c22c92c98995","381aa68fbce5a5a0","4cd7a243cb6c91cb","8701f782d0a02907","42b6d280c7a9aa00","b39136a1922cdce0","4634d78449eae430","95e6df5ecca555df","626a6ae7b35b68c9","400e90ddf0fa3f07","496f3800253ef260","e249090fbd863778","65cba3fc8192920d","e5db8e62ecac5e5c","4dad9a061f28342f","72cf5231f370bae2","3b4756762b625968","89ca62027a0bab3d","0fe59d4b9138aedb","a99a760144fa74da","93d97b8e423eb1be","995f342d1292637f","21685890eadf4653","bf7b2138c866781a","3e9c7358959904ad","800b2112407bb402","a17220d10fdd8199","f9f871010329ae35","905d37f641e54c7e","3f435acdb99f8bfc","8446300e226ef788","a5963a5f43ddccbc","867e5543c1019bef","68ad0ada3c13b3a0","c41913ee95066d64","46a542830454a1db","1b07f2d25f2214c4","eaae450ed3ca24e7","46fe40040c255dd6","fdf135b6af9c9166","683112a8c18173ed","0d65dc7e2f9443cd","109ec36c6f94cc08","81ba87b79296b858","e6016b855c6110ab","339872509a8d2b56","bbdc78e87b023e08","20cae2c098a28e81","2dfb4ee3b9091207","c712db36a5a76e43","f155ead2cf2d8bfd","4b1cd7c78c3aa4be","dd14a71f0038ded4","87045cfb99947380","81f9a461a52275b6","a29bd79b566b2552","7ef8a653657964d5","2ff3c4759c330629","ab9cb4646eef95fd","0e7be38bd7052238","266a3ef8847dcc88","f6da8bcc68ba27e0","80fac592809a00b6","7116f33160634297","6ea6633f22e6e965","84c3adae0049f970","65aea5711235c69b","45d64f753890f57c","69733ed9c8274e25","b03e58c2aa2f1777","f883a1690269349f","6da2d00b4f281366","44badfff14328e2f","b35a8e23e3c02b23","c375c643e4a7218e","85074787eb03bcac","7b7d992eb572e6bc","1eb4fcc0581eda3f","9302d7623a377b13","305d3b586720d119","eddef50308e24b99","4cca6356aae0ea4e","be59b17d5957aa98","cec0e3fd5352e551"];
 function sha256(s){ try{ if(!(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder)) return Promise.resolve(null); return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ return Array.prototype.map.call(new Uint8Array(b),function(x){ return ("0"+x.toString(16)).slice(-2); }).join("").slice(0,16); },function(){ return null; }); }catch(e){ return Promise.resolve(null); } }
 function issued(code){ if(!ISSUED.length) return Promise.resolve(true); return sha256(code).then(function(h){ return h===null?true:ISSUED.indexOf(h)>=0; }); }
 
@@ -789,117 +789,164 @@ function glanceText(){ return glance().filter(function(r){ return r[1]; }).map(f
 function buildPdf(){
   var J=window.jspdf&&window.jspdf.jsPDF; if(!J) return Promise.reject(new Error("nolib"));
   var doc=new J({unit:"mm",format:"a4",compress:true});
-  var PW=210,PH=297,M=16,CW=PW-2*M,y=0,page=0;
-  var INK=[18,16,24],RED=[192,57,43],GREY=[110,104,96],LINE=[214,208,198],PAPER=[251,249,245];
+  var PW=210,PH=297,M=14,CW=PW-2*M,y=0,page=0;
+  var INK=[18,16,24],RED=[192,57,43],GREEN=[46,125,79],AMBER=[201,162,39],GREY=[110,104,96],LINE=[214,208,198],PAPER=[251,249,245],SOFT=[243,239,232],TRACK=[228,223,214];
   var TOT="{total_pages_count_string}";
-  doc.setLineHeightFactor(1.35);
-  var LH=function(size){ return size*0.3528*1.35; };
-  function setf(size,style,col){ doc.setFont("helvetica",style||"normal"); doc.setFontSize(size); var c=col||INK; doc.setTextColor(c[0],c[1],c[2]); }
-  function hair(){ doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.2); doc.line(M,y-0.8,PW-M,y-0.8); }
+  doc.setLineHeightFactor(1.3);
+  var LH=function(size){ return size*0.3528*1.3; };
+  function col(c){ return c; }
+  function setf(size,style,c){ doc.setFont("helvetica",style||"normal"); doc.setFontSize(size); var k=c||INK; doc.setTextColor(k[0],k[1],k[2]); }
+  function fill(c){ doc.setFillColor(c[0],c[1],c[2]); }
+  function stroke(c,w){ doc.setDrawColor(c[0],c[1],c[2]); doc.setLineWidth(w||0.3); }
   function newPage(){
-    if(page>0) doc.addPage(); page++; y=M;
-    setf(7.5,"bold",GREY); doc.text("THIRD WAVE BBQ   -   MYSTERY DINER REPORT   -   DINER "+CODE,M,12); doc.text("Page "+page+" of "+TOT,PW-M,12,{align:"right"});
-    doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.3); doc.line(M,14.5,PW-M,14.5);
-    setf(7,"normal",GREY); doc.text("Confidential - head office only",M,PH-10); doc.text("Gold Coast - Surfers Paradise",PW-M,PH-10,{align:"right"});
-    y=M+6;
+    if(page>0) doc.addPage(); page++;
+    setf(7,"bold",GREY); doc.text("THIRD WAVE BBQ   -   MYSTERY DINER REPORT   -   DINER "+CODE,M,11); doc.text("Page "+page+" of "+TOT,PW-M,11,{align:"right"});
+    stroke(LINE,0.3); doc.line(M,13.5,PW-M,13.5);
+    setf(6.5,"normal",GREY); doc.text("Confidential - head office only",M,PH-9); doc.text("Gold Coast - Surfers Paradise",PW-M,PH-9,{align:"right"}); doc.text(BUILT,PW/2,PH-9,{align:"center"});
+    y=19;
   }
-  function need(h){ if(y+h>PH-18) newPage(); }
-  function band(num,title){ need(18); doc.setFillColor(INK[0],INK[1],INK[2]); doc.rect(M,y,CW,10,"F"); if(num){ setf(12,"bold",RED); doc.text(num,M+4,y+6.8); } setf(12,"bold",PAPER); doc.text(clean(title),M+(num?16:4),y+6.8); y+=14; }
-  function grp(title){ need(14); y+=2; setf(9.5,"bold",INK); doc.text(clean(title).toUpperCase(),M,y+3.2); y+=5.5; doc.setDrawColor(INK[0],INK[1],INK[2]); doc.setLineWidth(0.5); doc.line(M,y,PW-M,y); y+=3; }
-  function kv(label,value,lw){
-    lw=lw||52; var vw=CW-lw-4, val=clean(value||"");
-    setf(8,"bold",GREY); var ll=doc.splitTextToSize(clean(label).toUpperCase(),lw);
-    var vl; if(val){ setf(9,"normal",INK); vl=doc.splitTextToSize(val,vw); } else { vl=["Not answered"]; }
-    var h=Math.max(ll.length*LH(8),vl.length*LH(9))+2.6; need(h);
-    setf(8,"bold",GREY); doc.text(ll,M,y+3.3);
-    if(val) setf(9,"normal",INK); else setf(9,"italic",GREY);
-    doc.text(vl,M+lw+4,y+3.3); y+=h; hair();
+  function need(h){ if(y+h>PH-16) newPage(); }
+  function section(title,sub){ need(18); y+=2; setf(13,"bold",INK); doc.text(clean(title).toUpperCase(),M,y+4.5); if(sub){ setf(7.5,"normal",GREY); doc.text(clean(sub),PW-M,y+4.5,{align:"right"}); } y+=7; stroke(INK,0.6); doc.line(M,y,PW-M,y); y+=4; }
+  function txt(s,size,style,c,x,w,lh){ setf(size,style,c); var lines=doc.splitTextToSize(clean(s),w||CW); var l=lh||LH(size); for(var i=0;i<lines.length;i++){ need(l); doc.text(lines[i],x||M,y+size*0.3528*0.8); y+=l; } }
+  function tag(s,x,yy,c){ setf(6.5,"bold",c||GREY); doc.text(clean(s).toUpperCase(),x,yy); }
+  function hair(x1,x2){ stroke(LINE,0.2); doc.line(x1||M,y-0.8,x2||PW-M,y-0.8); }
+
+  /* ---------- graphic primitives ---------- */
+  function gauge(cx,cy,r,frac,c,label,big){
+    stroke(TRACK,2.6); doc.setLineCap(1); doc.circle(cx,cy,r,"S");
+    if(frac>0){ stroke(c,2.6); var n=Math.max(2,Math.round(72*frac)), a0=-Math.PI/2, step=2*Math.PI*frac/n; for(var i=0;i<n;i++){ var a1=a0+i*step,a2=a0+(i+1)*step; doc.line(cx+r*Math.cos(a1),cy+r*Math.sin(a1),cx+r*Math.cos(a2),cy+r*Math.sin(a2)); } }
+    doc.setLineCap(0); setf(big||15,"bold",INK); doc.text(label,cx,cy+ (big||15)*0.3528*0.36,{align:"center"});
   }
-  function ynRow(label,val){
-    setf(9,"normal",INK); var ll=doc.splitTextToSize(clean(label),CW-32); var h=Math.max(1,ll.length)*LH(9)+2.6; need(h);
-    setf(9,"normal",INK); doc.text(ll,M,y+3.3);
-    if(val==="No"){ setf(9,"bold",RED); doc.text("NO",PW-M,y+3.3,{align:"right"}); }
-    else if(val==="Yes"){ setf(9,"bold",INK); doc.text("YES",PW-M,y+3.3,{align:"right"}); }
-    else { setf(9,"italic",GREY); doc.text("not answered",PW-M,y+3.3,{align:"right"}); }
-    y+=h; hair();
+  function tick(x,yy,s,c){ stroke(c,1.1); doc.setLineCap(1); doc.line(x,yy+s*0.1,x+s*0.35,yy+s*0.5); doc.line(x+s*0.35,yy+s*0.5,x+s,yy-s*0.45); doc.setLineCap(0); }
+  function cross(x,yy,s,c){ stroke(c,1.1); doc.setLineCap(1); doc.line(x,yy-s*0.45,x+s*0.9,yy+s*0.45); doc.line(x+s*0.9,yy-s*0.45,x,yy+s*0.45); doc.setLineCap(0); }
+  function tile(x,yy,w,h,label,kind,val,sub){
+    fill(SOFT); doc.roundedRect(x,yy,w,h,2,2,"F");
+    tag(label,x+4,yy+6);
+    if(kind==="gauge"){ var v=+val||0, max=sub||10; gauge(x+w/2,yy+17.5,7.5,v?v/max:0,RED,v?String(v):"-",13); setf(6.5,"normal",GREY); doc.text("out of "+max,x+w/2,yy+h-2.5,{align:"center"}); }
+    else if(kind==="yn"){ var cy=yy+h/2+2; if(val==="Yes"){ fill(GREEN); doc.circle(x+w/2,cy,7.5,"F"); tick(x+w/2-4.5,cy+0.5,8,PAPER); } else if(val==="No"){ fill(RED); doc.circle(x+w/2,cy,7.5,"F"); cross(x+w/2-3.6,cy,8,PAPER); } else { stroke(TRACK,0.8); doc.circle(x+w/2,cy,7.5,"S"); setf(7,"italic",GREY); doc.text("not answered",x+w/2,cy+1,{align:"center"}); }
+      setf(8,"bold",val==="Yes"?GREEN:(val==="No"?RED:GREY)); doc.text(val?String(val).toUpperCase():"",x+w/2,yy+h-3,{align:"center"}); }
+    else if(kind==="exp"){ var cy2=yy+h/2+2, up=val==="Better", down=val==="Worse"; if(val){ var c=up?GREEN:(down?RED:INK); fill(c); if(up) doc.triangle(x+w/2-6,cy2+4,x+w/2+6,cy2+4,x+w/2,cy2-5,"F"); else if(down) doc.triangle(x+w/2-6,cy2-5,x+w/2+6,cy2-5,x+w/2,cy2+4,"F"); else doc.roundedRect(x+w/2-6,cy2-3,12,6,1,1,"F"); setf(8,"bold",c); doc.text(clean(val).toUpperCase(),x+w/2,yy+h-3,{align:"center"}); } else { setf(7,"italic",GREY); doc.text("not answered",x+w/2,cy2+1,{align:"center"}); } }
+    else { setf(14,"bold",INK); doc.text(clean(val||"-"),x+w/2,yy+h/2+4,{align:"center"}); if(sub){ setf(6.5,"normal",GREY); doc.text(clean(sub),x+w/2,yy+h-3,{align:"center"}); } }
   }
-  function trow(label,val){
-    setf(9,"normal",INK); var ll=doc.splitTextToSize(clean(label),CW-32); var h=Math.max(1,ll.length)*LH(9)+2.6; need(h);
-    setf(9,"normal",INK); doc.text(ll,M,y+3.3);
-    if(val){ setf(9,"bold",INK); doc.text(clean(val),PW-M,y+3.3,{align:"right"}); } else { setf(9,"italic",GREY); doc.text("not recorded",PW-M,y+3.3,{align:"right"}); }
-    y+=h; hair();
+  function bar(x,yy,w,label,val,max,c){
+    var v=+val||0; var lw=w*0.42; var fs=8; setf(fs,"normal",INK); while(fs>6&&doc.getTextWidth(clean(label))>lw-2){ fs-=0.5; setf(fs,"normal",INK); } doc.text(clean(label),x,yy+3.2);
+    var bx=x+lw, bw=w-lw-9; fill(TRACK); doc.roundedRect(bx,yy,bw,4.2,1,1,"F"); if(v>0){ fill(c||RED); doc.roundedRect(bx,yy,bw*v/max,4.2,1,1,"F"); }
+    setf(8,"bold",v?INK:GREY); doc.text(v?v+"/"+max:"-",x+w,yy+3.2,{align:"right"});
   }
-  function rateRow(label,v,n){
-    var cw=n*6.4; setf(9,"normal",INK); var ll=doc.splitTextToSize(clean(label),CW-cw-6); var h=Math.max(8,ll.length*LH(9)+2.6); need(h);
-    doc.text(ll,M,y+3.6); var x=PW-M-cw+0.8;
-    for(var i=1;i<=n;i++){ var on=String(v)===String(i); doc.setLineWidth(0.3);
-      if(on){ doc.setFillColor(RED[0],RED[1],RED[2]); doc.setDrawColor(RED[0],RED[1],RED[2]); doc.circle(x+2.4,y+2.8,2.4,"FD"); setf(6.5,"bold",PAPER); }
-      else { doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.circle(x+2.4,y+2.8,2.4,"S"); setf(6.5,"normal",GREY); }
-      doc.text(String(i),x+2.4,y+3.7,{align:"center"}); x+=6.4; }
-    if(!v){ setf(7,"italic",GREY); doc.text("not rated",PW-M-cw-2,y+3.6,{align:"right"}); }
-    y+=h; hair();
-  }
-  function photoGrid(list,cap){
-    var gap=4, w=(CW-gap)/2, maxH=66, rowY=0, rowH=0, ch=Promise.resolve();
+  function stackBar(x,yy,w,yes,no,blank){ var t=yes+no+blank||1; var wy=w*yes/t, wn=w*no/t; fill(TRACK); doc.roundedRect(x,yy,w,4.2,1,1,"F"); if(yes){ fill(GREEN); doc.rect(x,yy,wy,4.2,"F"); } if(no){ fill(RED); doc.rect(x+wy,yy,wn,4.2,"F"); } }
+  function pill(x,yy,text,c){ setf(7.5,"bold",c||INK); var w=doc.getTextWidth(clean(text))+6; stroke(c||INK,0.35); doc.roundedRect(x,yy,w,6,3,3,"S"); doc.text(clean(text),x+3,yy+4.1); return w+2.5; }
+  function pillRow(items,yy,x){ var cx=x||M; items.forEach(function(it){ if(!it[1]) return; var w=doc.getTextWidth(clean(it[0]+": "+it[1]))+6; if(cx+w>PW-M){ cx=M; yy+=8; } setf(7.5,"bold",INK); stroke(LINE,0.35); doc.roundedRect(cx,yy,w,6,3,3,"S"); setf(7.5,"normal",GREY); doc.text(clean(it[0]+":"),cx+3,yy+4.1); var lw=doc.getTextWidth(clean(it[0]+": ")); setf(7.5,"bold",INK); doc.text(clean(it[1]),cx+3+lw,yy+4.1); cx+=w+2.5; }); return yy+8; }
+  function quote(label,text,c){ if(!text) return; setf(9.5,"italic",INK); var lines=doc.splitTextToSize('"'+clean(text)+'"',CW-14); var h=lines.length*LH(9.5)+7; need(h); fill(c||RED); doc.rect(M,y,1.6,h-2,"F"); tag(label,M+6,y+3.2,c||RED); setf(9.5,"italic",INK); doc.text(lines,M+6,y+8); y+=h; }
+  function kv(label,value){ var val=clean(value||""); if(!val) return; setf(7,"bold",GREY); var ll=doc.splitTextToSize(clean(label).toUpperCase(),50); setf(9,"normal",INK); var vl=doc.splitTextToSize(val,CW-56); var h=Math.max(ll.length*LH(7),vl.length*LH(9))+2.4; need(h); setf(7,"bold",GREY); doc.text(ll,M,y+3.2); setf(9,"normal",INK); doc.text(vl,M+56,y+3.2); y+=h; hair(); }
+  function ynLine(x,yy,w,label,val){ setf(8,"normal",INK); var ll=doc.splitTextToSize(clean(label),w-16); doc.text(ll[0],x,yy+3.2); if(val==="Yes"){ tick(x+w-8,yy+2.2,5,GREEN); } else if(val==="No"){ cross(x+w-7.5,yy+2,5,RED); setf(7.5,"bold",RED); } else { setf(7,"italic",GREY); doc.text("-",x+w-2,yy+3.2,{align:"right"}); } }
+
+  /* ---------- data ---------- */
+  var yn=ynAll(), nos=yn.filter(function(x){ return x.val==="No"; }), blanks=yn.filter(function(x){ return !x.val; });
+  var BUILT="Report built "+new Date().toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"})+"  -  "+blanks.length+" question"+(blanks.length===1?"":"s")+" left blank";
+  var secStats={}; var secOrder=[]; yn.forEach(function(x){ if(!secStats[x.sec]){ secStats[x.sec]={yes:0,no:0,blank:0}; secOrder.push(x.sec); } if(x.val==="Yes") secStats[x.sec].yes++; else if(x.val==="No") secStats[x.sec].no++; else secStats[x.sec].blank++; });
+  var k=function(i){ return sval("k"+i+"_t"); };
+  function tmin(t){ return /^\d\d:\d\d$/.test(t||"")?(+t.slice(0,2))*60+(+t.slice(3)):null; }
+
+  /* ---------- page 1: scorecard ---------- */
+  newPage();
+  fill(INK); doc.rect(M,y,CW,22,"F");
+  setf(8.5,"bold",RED); doc.text("THIRD WAVE BBQ",M+5,y+7.5); setf(17,"bold",PAPER); doc.text("MYSTERY DINER REPORT",M+5,y+16.5);
+  setf(7.5,"normal",PAPER); doc.text("Gold Coast - Surfers Paradise",PW-M-5,y+7.5,{align:"right"}); setf(14,"bold",RED); doc.text("DINER "+CODE,PW-M-5,y+16.5,{align:"right"});
+  y+=26;
+  var meta=[fmtDate(sval("v_date"))||"date not given", (sval("v_in")||sval("v_out"))?"arrived "+(sval("v_in")||"?")+", left "+(sval("v_out")||"?"):"", (sval("v_adults")||"?")+" adults, "+(sval("v_kids")||"0")+" kids", sval("v_booked")?"booked "+sval("v_booked").toLowerCase():"", money("v_spend")?money("v_spend")+" spent":"", sval("d_name")||""].filter(Boolean).join("   |   ");
+  setf(8.5,"normal",GREY); doc.text(doc.splitTextToSize(clean(meta),CW),M,y+3); y+=9;
+  var tw=(CW-9)/4, th=32;
+  tile(M,y,tw,th,"Overall","gauge",sval("vd_overall"),10);
+  tile(M+tw+3,y,tw,th,"Would come back","yn",sval("vd_back"));
+  tile(M+2*(tw+3),y,tw,th,"Would recommend","yn",sval("vd_rec"));
+  tile(M+3*(tw+3),y,tw,th,"Against expectations","exp",sval("pr_kept"));
+  y+=th+5;
+  var words=[1,2,3].map(function(n){ return sval("a_w"+n); }).filter(Boolean);
+  if(words.length){ setf(7,"bold",GREY); doc.text("THE ROOM IN THREE WORDS",M,y+3); var wx=M+46; words.forEach(function(w){ wx+=pill(wx,y-1,w,RED); }); y+=9; }
+  quote("Fix first",sval("vd_fix"),RED);
+  quote("They nailed",sval("vd_nailed"),GREEN);
+
+  section("The scores","every 1 to 5 rating");
+  var colW=(CW-8)/2, L=M, R=M+colW+8, yL=y, yR=y;
+  function barsAt(x,yy,rows,title){ tag(title,x,yy+2.5,INK); yy+=6; rows.forEach(function(r){ bar(x,yy,colW,r[0],r[1],5,r[2]); yy+=7.2; }); return yy+2; }
+  yL=barsAt(L,yL,[["Starters - taste",sval("f0_taste")],["Starters - portion",sval("f0_portion")],["Mains - taste",sval("f1_taste")],["Mains - portion",sval("f1_portion")],["Dessert - taste",sval("f2_taste")],["Dessert - portion",sval("f2_portion")]],"Food");
+  yR=barsAt(R,yR,[["Worth it",sval("val_worth")],["Bring friends or family",sval("a_evening")],["Instagram food photos",sval("o_ig_hungry")],["Instagram: would pick it",sval("o_ig_pick")]],"Venue and value");
+  var ZSHORT=["Entry","Dining floor","Table and seating","Cutlery and glassware","Bar","Pass and kitchen"];
+  var zoneRows=ZONES.map(function(z,i){ return [ZSHORT[i]||z,sval("z"+i+"_clean"),sval("z"+i+"_cond")]; });
+  yR=barsAt(R,yR,zoneRows.slice(0,3).map(function(r){ return [r[0]+" - clean",r[1]]; }).concat(zoneRows.slice(0,3).map(function(r){ return [r[0]+" - condition",r[2],INK]; })),"Zones (1)");
+  yL=barsAt(L,yL,zoneRows.slice(3).map(function(r){ return [r[0]+" - clean",r[1]]; }).concat(zoneRows.slice(3).map(function(r){ return [r[0]+" - condition",r[2],INK]; })),"Zones (2)");
+  y=Math.max(yL,yR)+2;
+
+  section("Yes and no","green yes, red no, grey left blank");
+  var sx=M, sw=(CW-8)/2, rowsN=0;
+  secOrder.forEach(function(s,i){ var st=secStats[s]; var x=(i%2===0)?M:M+sw+8; if(i%2===0){ need(14); } setf(8,"bold",INK); doc.text(clean(s),x,y+3.2); setf(7.5,"normal",GREY); doc.text(st.yes+" yes, "+st.no+" no"+(st.blank?", "+st.blank+" blank":""),x+sw,y+3.2,{align:"right"}); stackBar(x,y+5,sw,st.yes,st.no,st.blank); if(i%2===1||i===secOrder.length-1) y+=13; });
+  y+=1;
+  if(nos.length){ need(10); fill(RED); doc.rect(M,y,1.6,0.1,"F"); tag("What went wrong - every No",M,y+3,RED); y+=6; nos.forEach(function(x){ need(6); fill(RED); doc.circle(M+1.5,y+2.1,1,"F"); setf(8.5,"normal",INK); var ll=doc.splitTextToSize(clean(x.label)+"  ("+clean(x.sec)+")",CW-6); doc.text(ll,M+5,y+3); y+=ll.length*LH(8.5)+1.2; }); }
+  else { setf(8.5,"italic",GREEN); doc.text("Nothing marked No.",M,y+3); y+=7; }
+  y+=3;
+
+  section("The clock","minutes between moments");
+  var marks=[["Drinks ordered",k(0)],["Drinks on table",k(1)],["Food ordered",k(2)],["Starters",k(3)],["Mains",k(4)],["Paid and out",k(7)]].map(function(m){ return {l:m[0],t:m[1],v:tmin(m[1])}; });
+  var known=marks.filter(function(m){ return m.v!==null; });
+  if(known.length>=2){
+    need(34); var t0=Math.min.apply(null,known.map(function(m){ return m.v; })), t1=Math.max.apply(null,known.map(function(m){ return m.v; })); var span=Math.max(1,t1-t0); var ax=M+4, aw=CW-8, ay=y+14;
+    stroke(TRACK,1.2); doc.setLineCap(1); doc.line(ax,ay,ax+aw,ay); doc.setLineCap(0);
+    known.forEach(function(m,i){ var x=ax+aw*(m.v-t0)/span; fill(RED); doc.circle(x,ay,1.8,"F"); var above=i%2===0; setf(7.5,"bold",INK); doc.text(m.t,x,above?ay-7:ay+9.5,{align:"center"}); setf(6.5,"normal",GREY); doc.text(clean(m.l),x,above?ay-3.5:ay+13,{align:"center"}); if(i>0){ var p=known[i-1], px=ax+aw*(p.v-t0)/span, gap=m.v-p.v; if(gap>0&&x-px>14){ setf(6.5,"bold",RED); doc.text(gap+" min",(px+x)/2,ay-0.9,{align:"center"}); } } });
+    y=ay+18;
+    var extra=[["Check-back on the food",sval("k5_y")],["Dessert offered",sval("k6_y")],["Asked for twice",sval("k_twice")],["Longest wait",sval("k_longest")?sval("k_longest")+" min":""]];
+    y=pillRow(extra,y);
+  } else { txt("No times recorded.",8.5,"italic",GREY); y+=2; }
+
+  section("Comfort and service","as the diner found it");
+  y=pillRow([["Music",sval("c_music")],["Lighting",sval("c_light")],["Temperature",sval("c_temp")],["Smell",sval("c_smell")],["On arrival",sval("x_shown")]],y);
+  y=pillRow([["Confident answer",sval("s_confident")],["Specials offered",sval("s_specials")],["Recommended something",sval("s_rec")],["Could pick the manager",sval("m_pick")],["Manager visited",sval("m_visit")],["Room felt",sval("m_room")]],y);
+  y+=2;
+
+  /* ---------- the detail ---------- */
+  section("In their words","what the diner wrote");
+  var detail=[["Who noticed you",sval("x_who")],["Exactly what they said",sval("x_said")&&'"'+sval("x_said")+'"'],["First 60 seconds",sval("x_first")],["Website - out of date or broken",sval("o_w_broken")],["Outside - faded, broken or dirty",sval("x_faded")],["What let a zone down",ZONES.map(function(z,i){ return sval("z"+i+"_note")?z+": "+sval("z"+i+"_note"):""; }).filter(Boolean).join("; ")],["Something you touched let it down",sval("c_touch")],["What they recommended",sval("s_rec_what")],["How you spotted the manager",sval("m_how")],["Starters",[sval("f0_name"),sval("f0_note")].filter(Boolean).join(" - ")],["Mains",[sval("f1_name"),sval("f1_note")].filter(Boolean).join(" - ")],["Dessert",[sval("f2_name"),sval("f2_note")].filter(Boolean).join(" - ")],["Drinks",sval("dr_note")],["What was different from expectations",sval("pr_diff")]];
+  var any=false; detail.forEach(function(d){ if(d[1]){ any=true; kv(d[0],d[1]); } }); if(!any){ txt("No written answers.",8.5,"italic",GREY); }
+  y+=2;
+
+  /* ---------- photos ---------- */
+  function photoGrid(list,cap,cols){
+    cols=cols||3; var gap=3, w=(CW-gap*(cols-1))/cols, maxH=cols===3?48:66, rowY=0, rowH=0, ch=Promise.resolve();
     list.forEach(function(rec,i){ ch=ch.then(function(){ return blobToDataURL(rec.blob).then(function(d){
-      var sc=Math.min(w/rec.w,maxH/rec.h), iw=rec.w*sc, ih=rec.h*sc, col=i%2;
-      if(col===0){ need(maxH+9); rowY=y; rowH=0; }
-      var x=M+col*(w+gap); doc.addImage(d,"JPEG",x,rowY,iw,ih);
-      setf(7.5,"normal",GREY); var c=clean(cap+(list.length>1?" ("+(i+1)+" of "+list.length+")":"")+(rec.cap?" - "+rec.cap:"")); doc.text(doc.splitTextToSize(c,w),x,rowY+ih+3.4);
-      var hh=ih+7; if(hh>rowH) rowH=hh; if(col===1||i===list.length-1){ y=rowY+rowH+3; }
+      var sc=Math.min(w/rec.w,maxH/rec.h), iw=rec.w*sc, ih=rec.h*sc, c=i%cols;
+      if(c===0){ need(maxH+9); rowY=y; rowH=0; }
+      var x=M+c*(w+gap); fill(SOFT); doc.rect(x,rowY,w,maxH,"F"); doc.addImage(d,"JPEG",x+(w-iw)/2,rowY+(maxH-ih)/2,iw,ih);
+      setf(6.8,"normal",GREY); doc.text(doc.splitTextToSize(clean(cap+(list.length>1?" ("+(i+1)+")":"")+(rec.cap?" - "+rec.cap:"")),w)[0],x,rowY+maxH+3.2);
+      rowH=maxH+6; if(c===cols-1||i===list.length-1){ y=rowY+rowH+2; }
     }); }); });
     return ch;
   }
-  function photos(id,l){ var list=P[id]||[]; if(!list.length){ kv("Photos: "+l,""); return Promise.resolve(); } return photoGrid(list,l); }
-  function pf(f,pfx){
-    var id=pfx+(f.id||""), v, ch;
-    switch(f.t){
-      case "row": ch=Promise.resolve(); f.fields.forEach(function(x){ ch=ch.then(function(){ return pf(x,pfx); }); }); return ch;
-      case "text": kv(lab(f),sval(id)?(f.quote?'"'+sval(id)+'"':sval(id)):""); break;
-      case "area": kv(lab(f),sval(id)); break;
-      case "date": kv(lab(f),fmtDate(sval(id))); break;
-      case "time": kv(lab(f),sval(id)); break;
-      case "num": v=sval(id); kv(lab(f),v?(f.pre||"")+v+(f.suf?" "+f.suf:""):""); break;
-      case "checks": f.items.forEach(function(it){ ynRow(it[1],sval(pfx+it[0])); }); break;
-      case "single": kv(lab(f)||"Answer",sval(id)); break;
-      case "yn": ynRow(lab(f),sval(id)); break;
-      case "rate": rateRow(lab(f),sval(id),f.max||5); break;
-      case "words3": v=[1,2,3].map(function(n){ return sval(id+n); }).filter(Boolean); kv(lab(f),v.join(", ")); break;
-      case "zones": f.items.forEach(function(z,i){ var b=f.id+i+"_"; kv(z,[sval(b+"clean")&&"clean "+sval(b+"clean")+" / 5", sval(b+"cond")&&"condition "+sval(b+"cond")+" / 5", sval(b+"note")].filter(Boolean).join(", ")); }); break;
-      case "clock": f.items.forEach(function(it,i){ var b=f.id+i+"_"; if(it.yn){ ynRow(it.m,sval(b+"y")); } else { trow(it.m+(sval(b+"n")?"  —  "+sval(b+"n"):""),sval(b+"t")); } }); break;
-      case "repeat":
-        ch=Promise.resolve();
-        for(var r=0;r<shown[f.id];r++){ (function(r){ var bp=f.id+r+"_"; if(!repHas(f,bp)) return; ch=ch.then(function(){ grp(repTitle(f,r)); var c2=Promise.resolve(); cardFields(f,r).forEach(function(sf){ c2=c2.then(function(){ return pf(sf,bp); }); }); return c2; }); })(r); }
-        return ch;
-      case "photo": return photos(id,slotLabel(id));
-    }
-    return Promise.resolve();
+  var slots=allSlots().filter(function(s){ return (P[s.id]||[]).length; });
+  var pchain=Promise.resolve();
+  if(slots.length){
+    pchain=pchain.then(function(){ need(80); section("The evidence",photoCount()+" photos, each stamped with the diner number and time"); });
+    var groups={}; var gorder=[]; slots.forEach(function(s){ if(!groups[s.sec]){ groups[s.sec]=[]; gorder.push(s.sec); } groups[s.sec].push(s); });
+    gorder.forEach(function(sec){ pchain=pchain.then(function(){ var sObj=SECTIONS.filter(function(x){ return x.id===sec; })[0]; need(60); tag((sObj?sObj.num+"  "+sObj.title:sec),M,y+3,INK); y+=6; var items=[]; groups[sec].forEach(function(s){ var list=P[s.id]||[]; list.forEach(function(r,i){ items.push({rec:r,cap:s.label+(list.length>1?" ("+(i+1)+")":"")+(r.cap?" - "+r.cap:"")}); }); }); return photoGridItems(items,3).then(function(){ y+=3; }); }); });
   }
-  newPage();
-  doc.setFillColor(INK[0],INK[1],INK[2]); doc.rect(M,y,CW,24,"F");
-  setf(9,"bold",RED); doc.text("THIRD WAVE BBQ",M+6,y+8); setf(18,"bold",PAPER); doc.text("MYSTERY DINER REPORT",M+6,y+18);
-  setf(8,"normal",PAPER); doc.text("Gold Coast - Surfers Paradise",PW-M-6,y+8,{align:"right"}); setf(15,"bold",RED); doc.text("DINER "+CODE,PW-M-6,y+18,{align:"right"});
-  y+=30;
-  kv("Visit date",fmtDate(sval("v_date")));
-  kv("Arrived / left",[sval("v_in"),sval("v_out")].filter(Boolean).join("  -  "));
-  kv("Party",(sval("v_adults")||"?")+" adults, "+(sval("v_kids")||"0")+" kids");
-  kv("Booked",sval("v_booked"));
-  kv("Receipt kept",sval("v_receipt"));
-  kv("Diner",[sval("d_name"),sval("d_contact")].filter(Boolean).join(", "));
-  kv("Report built",new Date().toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}));
-  y+=4; grp("At a glance");
-  glance().forEach(function(r){ kv(r[0],r[1]); });
-  var chain=Promise.resolve();
-  SECTIONS.forEach(function(s){
-    if(s.send||s.id==="start") return;
-    chain=chain.then(function(){
-      need(70); y+=4; band(s.num,s.title);
-      var c=Promise.resolve();
-      s.groups.forEach(function(g){ if(g.fields.every(function(f){ return f.t==="pcl"||f.t==="recall"||f.t==="rules"||f.t==="note"; })) return; c=c.then(function(){ grp(g.h+(g.r?" "+g.r:"")); var c2=Promise.resolve(); g.fields.forEach(function(f){ c2=c2.then(function(){ return pf(f,""); }); }); return c2.then(function(){ y+=2; }); }); });
-      return c;
-    });
+  function photoGridItems(items,cols){
+    var gap=3, w=(CW-gap*(cols-1))/cols, maxH=48, rowY=0, ch=Promise.resolve();
+    items.forEach(function(it,i){ ch=ch.then(function(){ return blobToDataURL(it.rec.blob).then(function(d){
+      var rec=it.rec, sc=Math.min(w/rec.w,maxH/rec.h), iw=rec.w*sc, ih=rec.h*sc, c=i%cols;
+      if(c===0){ need(maxH+9); rowY=y; }
+      var x=M+c*(w+gap); fill(SOFT); doc.rect(x,rowY,w,maxH,"F"); doc.addImage(d,"JPEG",x+(w-iw)/2,rowY+(maxH-ih)/2,iw,ih);
+      setf(6.8,"normal",GREY); doc.text(doc.splitTextToSize(clean(it.cap),w)[0],x,rowY+maxH+3.2);
+      if(c===cols-1||i===items.length-1){ y=rowY+maxH+8; }
+    }); }); });
+    return ch;
+  }
+
+  /* ---------- appendix: every yes/no ---------- */
+  return pchain.then(function(){
+    need(70); y+=3; section("Every yes and no","the full checklist, for the record");
+    var half=(CW-8)/2, i=0; var bySec={}; var order=[]; yn.forEach(function(x){ if(!bySec[x.sec]){ bySec[x.sec]=[]; order.push(x.sec); } bySec[x.sec].push(x); });
+    order.forEach(function(sec){ var items=bySec[sec]; var rows=Math.ceil(items.length/2); need(6+rows*5.4+3); tag(sec,M,y+3,INK); y+=6; for(var r=0;r<rows;r++){ need(6); var a=items[r], b=items[r+rows]; ynLine(M,y,half,a.label,a.val); if(b) ynLine(M+half+8,y,half,b.label,b.val); y+=5.4; stroke(LINE,0.15); doc.line(M,y-0.6,PW-M,y-0.6); } y+=3; });
+    try{ doc.putTotalPages(TOT); }catch(e){}
+    return doc.output("blob");
   });
-  return chain.then(function(){ try{ doc.putTotalPages(TOT); }catch(e){} return doc.output("blob"); });
 }
 function mb(b){ return b.size<1048576?Math.max(1,Math.round(b.size/1024))+" KB":(b.size/1048576).toFixed(1)+" MB"; }
 function openAlt(){ var d=$("#alt"); if(d) d.open=true; }
@@ -916,7 +963,18 @@ function prepPdf(){
   buildPdf().then(function(b){ if(my!==pdfGen) return; pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); if(sentAt()) showSent(); },function(e){ if(my!==pdfGen) return; fail("Couldn’t build the PDF on this phone. Use the email option below instead."); });
 }
 var ENDPOINT="https://script.google.com/macros/s/AKfycbwDMxRuwxcIoUS3ZrjnSQNhixxXj12j_G2X-Ud3RcT1MDsGVadzDzslDNEQsIu9Se_8/exec", SECRET="twb-md-2026-surfers";
-function emailText(){ return subject()+"\n\nFull report with every photo attached as PDF.\n\nAT A GLANCE\n"+glanceText()+"\n\nSent from the Third Wave BBQ mystery diner form."; }
+function emailText(){
+  var yn=ynAll(), nos=yn.filter(function(x){ return x.val==="No"; });
+  var line=function(l,v){ return v?l+": "+v:""; };
+  var head=[line("Overall",r5("vd_overall",10)),line("Would come back",sval("vd_back")),line("Would recommend",sval("vd_rec")),line("Against expectations",sval("pr_kept"))].filter(Boolean).join("  ·  ");
+  var L=[subject(),"Full report with every photo is in the attached PDF.",""];
+  if(head) L.push(head);
+  if(sval("vd_fix")) L.push("Fix first: "+sval("vd_fix"));
+  if(sval("vd_nailed")) L.push("They nailed: "+sval("vd_nailed"));
+  L.push(nos.length?"Marked No ("+nos.length+"): "+nos.map(function(x){ return x.label; }).join("; "):"Nothing marked No.");
+  var tail=[money("v_spend")&&money("v_spend")+" spent",photoCount()+" photos"].filter(Boolean).join("  ·  "); if(tail) L.push(tail);
+  return L.join("\n");
+}
 function sentAt(){ try{ return +localStorage.getItem(skey()+":sent")||0; }catch(e){ return 0; } }
 function showSent(){ var b=$("#sendbtn"); if(b){ b.disabled=true; b.hidden=false; b.textContent="Sent"; } var t=sentAt(); setSendNote("Sent"+(t?" "+whenText(t):"")+". Your report and photos are with Third Wave BBQ — nothing else to do. Thank you."); }
 function sentOK(){ try{ localStorage.setItem(skey()+":sent",String(Date.now())); }catch(e){} showSent(); toast("Sent."); }
