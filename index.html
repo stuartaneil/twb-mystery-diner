@@ -287,14 +287,6 @@ var SECTIONS=[
  ]}
 ]},
 {id:"staff",tab:"04 Staff",num:"04",title:"STAFF & SERVICE",groups:[
- {h:"EVERYONE YOU DEALT WITH",note:"No need for names — “tall, beard, ran the floor” is perfect",fields:[
-  {t:"repeat",id:"p",title:"Person",add:"Add another person",fields:[
-   {t:"text",id:"who",label:"Who — describe them"},
-   {t:"text",id:"did",label:"What they did"},
-   {t:"text",id:"said",label:"Exactly what they said",quote:1},
-   {t:"rate",id:"r",label:"Out of 5"}
-  ]}
- ]},
  {h:"TAKING YOUR ORDER",fields:[
   {t:"note",text:"Please ask one menu question — “what’s the brisket like?” works nicely."},
   {t:"checks",items:[["s_confident","Confident answer, no guessing"],["s_specials","Specials or favourites offered unprompted"],["s_rec","Recommended something"]]},
@@ -302,11 +294,6 @@ var SECTIONS=[
  ]},
  {h:"OFFERED",r:"WITHOUT YOU ASKING",fields:[
   {t:"checks",items:[["u_drinks","Drinks as you sat down"],["u_round","Another round when glasses were low"],["u_sides","Sides with the mains"],["u_upgrade","A bigger cut or an upgrade"],["u_dessert","Dessert"],["u_takehome","Anything to take home"]]}
- ]},
- {h:"IN THEIR EXACT WORDS",fields:[
-  {t:"text",id:"w_order",label:"Taking the order",quote:1},
-  {t:"text",id:"w_food",label:"Dropping the food",quote:1},
-  {t:"text",id:"w_bill",label:"Bringing the bill",quote:1}
  ]},
  {h:"THE MANAGER",fields:[
   {t:"single",id:"m_pick",label:"Could you pick who was running the room?",q:1,opts:["Yes","No"]},
