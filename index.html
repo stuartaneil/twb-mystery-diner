@@ -384,6 +384,8 @@ var CODE=null, ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function codeOk(c){ c=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,""); if(c.slice(0,3)!=="TWB") return null; var b=c.slice(3); if(b.length!==5) return null; var s=0; for(var i=0;i<4;i++){ var k=ALPH.indexOf(b.charAt(i)); if(k<0) return null; s+=k*(i+2); } if(ALPH.charAt(s%32)!==b.charAt(4)) return null; return "TWB-"+b; }
 function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).get("v"); }catch(e){} var c=codeOk(q)||codeOk((location.hash||"").replace(/^#/,"")); if(!c){ try{ c=codeOk(localStorage.getItem(KEY+":code")); }catch(e){} } CODE=c; if(c){ try{ localStorage.setItem(KEY+":code",c); }catch(e){} } }
 function skey(){ return KEY+":"+CODE; }
+var pdfGen=0;
+function invalidatePdf(){ pdfBlob=null; pdfBuilding=false; pdfGen++; }
 var storageOK=true, loadedAt=0, stateT=null, INAPP=/FBAN|FBAV|Instagram|Line\/|Messenger|Twitter|TikTok|Snapchat|Slack|Teams|MicroMessenger|GSA\//i.test(navigator.userAgent);
 function probeStorage(){ try{ localStorage.setItem(KEY+":probe","1"); localStorage.removeItem(KEY+":probe"); storageOK=true; }catch(e){ storageOK=false; } try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(){},function(){}); } }catch(e){} }
 function setStatus(t,bad){ var el=$("#st"); if(!el) return; el.hidden=!t; el.textContent=t||""; el.classList.toggle("bad",!!bad); }
@@ -396,13 +398,16 @@ function bootStatus(){
   else { setStatus("Answers save to this browser as you type",false); }
   if(n&&!bootStatus.done){ bootStatus.done=true; toast("Welcome back — your answers from "+(whenText(loadedAt)||"earlier")+" are still here."); }
 }
-function renderGate(){ $("#strip").hidden=true; $("#main").innerHTML='<section class="gate"><h1 class="h1">THIS FORM OPENS FROM YOUR <b>PERSONAL LINK</b></h1><div class="rule"></div><p class="note">Every mystery diner gets their own link with a diner number in it. Please open the exact link you were sent.</p><p class="note">If it isn’t working, email <span class="addr">'+TO+'</span> and we’ll sort it out.</p></section>'; }
+function renderGate(notListed){ $("#strip").hidden=true; $("#main").innerHTML='<section class="gate"><h1 class="h1">'+(notListed?'THAT DINER NUMBER ISN’T <b>ON OUR LIST</b>':'THIS FORM OPENS FROM YOUR <b>PERSONAL LINK</b>')+'</h1><div class="rule"></div><p class="note">'+(notListed?'Please use the exact link you were sent — every diner has their own.':'Every mystery diner gets their own link with a diner number in it. Please open the exact link you were sent.')+'</p><p class="note">If it isn’t working, email <span class="addr">'+TO+'</span> and we’ll sort it out.</p></section>'; }
+var ISSUED=["5c2941f2575cf2f6","388fb2bf808e85e5","8f90c9d20f6a189a","36eb96b8f19c1bdf","572f600c44425731","373914b39514ddba","a82faaf0d4616814","4ab4478a2910693f","bb77ee32a88af6a5","a987041e0b2c74c5","24cc18aebfe73381","f94657047e81f9f6","362affa9bda0bd8e","3ad0175c11297e8b","6564fd3f70223985","6bc206948324f2c9","a27ca55886b755af","7935c22c92c98995","381aa68fbce5a5a0","4cd7a243cb6c91cb","8701f782d0a02907","42b6d280c7a9aa00","b39136a1922cdce0","4634d78449eae430","95e6df5ecca555df","626a6ae7b35b68c9","400e90ddf0fa3f07","496f3800253ef260","e249090fbd863778","65cba3fc8192920d","e5db8e62ecac5e5c","4dad9a061f28342f","72cf5231f370bae2","3b4756762b625968","89ca62027a0bab3d","0fe59d4b9138aedb","a99a760144fa74da","93d97b8e423eb1be","995f342d1292637f","21685890eadf4653","bf7b2138c866781a","3e9c7358959904ad","800b2112407bb402","a17220d10fdd8199","f9f871010329ae35","905d37f641e54c7e","3f435acdb99f8bfc","8446300e226ef788","a5963a5f43ddccbc","867e5543c1019bef"];
+function sha256(s){ try{ if(!(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder)) return Promise.resolve(null); return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ return Array.prototype.map.call(new Uint8Array(b),function(x){ return ("0"+x.toString(16)).slice(-2); }).join("").slice(0,16); },function(){ return null; }); }catch(e){ return Promise.resolve(null); } }
+function issued(code){ if(!ISSUED.length) return Promise.resolve(true); return sha256(code).then(function(h){ return h===null?true:ISSUED.indexOf(h)>=0; }); }
 
 function load(){
   try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
 }
 function save(){
-  pdfBlob=null;
+  invalidatePdf();
   clearTimeout(saveT);
   saveT=setTimeout(function(){
     var ok=false;
@@ -493,7 +498,7 @@ function removePhoto(k){
   var slot=k.split(":")[0]; P[slot]=(P[slot]||[]).filter(function(r){ return r.k!==k; });
   idbDel(k).catch(function(){}); renderSlot(slot); save(); if(cur==="verdict") renderPcl(); toast("Photo removed");
 }
-function setCap(k,v){ var rec=findRec(k); if(!rec) return; rec.cap=v; clearTimeout(capT[k]); capT[k]=setTimeout(function(){ idbPut(rec).catch(function(){}); },400); pdfBlob=null; }
+function setCap(k,v){ var rec=findRec(k); if(!rec) return; rec.cap=v; clearTimeout(capT[k]); capT[k]=setTimeout(function(){ idbPut(rec).catch(function(){}); },400); invalidatePdf(); }
 
 function renderSlot(id){
   var box=$('.ph[data-slot="'+id+'"]'); if(!box) return;
@@ -599,7 +604,7 @@ function build(){
     var bk=(recs||[]).filter(function(r){ return r.k==="state:"+CODE; })[0];
     if(bk&&bk.S&&Object.keys(S).length===0&&Object.keys(bk.S).length){ S=bk.S; cur=bk.cur||cur; loadedAt=bk.at||0; if(bk.shown){ shown.p=bk.shown.p||4; shown.f=bk.shown.f||4; } restore(); show(cur,true); bootStatus(); }
     (recs||[]).sort(function(a,b){ return a.at-b.at; }).forEach(function(r){ if(!SLOTMETA[r.slot]||r.code!==CODE) return; (P[r.slot]=P[r.slot]||[]).push(r); var m=/^f(\d+)_ph$/.exec(r.slot); if(m) shown.f=Math.max(shown.f,+m[1]+1); });
-    restoreReps(); renderAllSlots(); refresh(); if(cur==="verdict") renderPcl(); if(cur==="send") buildSend();
+    restoreReps(); renderAllSlots(); refresh(); invalidatePdf(); if(cur==="verdict") renderPcl(); if(cur==="send") buildSend();
   },function(){ toast("Photos can’t be stored on this phone in this browser — they will still go into the PDF while the page stays open"); });
 }
 
@@ -808,8 +813,9 @@ function prepPdf(){
   if(!(window.jspdf&&window.jspdf.jsPDF)){ fail("The PDF maker didn’t load on this connection. Use Open email app for the text and attach the photos from the gallery below."); return; }
   if(pdfBlob){ setBtns(false,"Send the report ("+mb(pdfBlob)+")","Save the PDF ("+mb(pdfBlob)+")"); return; }
   if(pdfBuilding) return;
+  var my=++pdfGen;
   pdfBuilding=true; setBtns(true,"Preparing your PDF…","Preparing your PDF…"); msg.hidden=true;
-  buildPdf().then(function(b){ pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); },function(e){ fail("Couldn’t build the PDF on this phone. Use Open email app for the text and attach the photos from the gallery below."); });
+  buildPdf().then(function(b){ if(my!==pdfGen) return; pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); },function(e){ if(my!==pdfGen) return; fail("Couldn’t build the PDF on this phone. Use Open email app for the text and attach the photos from the gallery below."); });
 }
 function sendReport(){
   if(!pdfBlob){ prepPdf(); toast("Still preparing the PDF — one moment."); return; }
@@ -916,18 +922,21 @@ document.addEventListener("click",function(e){
     copy(TO).then(function(ok){ toast(ok?"Address copied: "+TO:"Address: "+TO); });
   } else if(b.id==="clearbtn"){
     if(!clearArmed){ clearArmed=true; b.textContent="Tap again to clear everything"; b.classList.add("red"); setTimeout(function(){ clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); },4000); }
-    else { try{ localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:4}; pdfBlob=null; clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); toast("Cleared"); }
+    else { try{ localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:4}; invalidatePdf(); clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); toast("Cleared"); }
   }
 });
 
 /* ---------- boot ---------- */
 function start(data){
   resolveCode();
-  if(!CODE){ renderGate(); return; }
-  probeStorage();
-  load();
-  if(data&&data.S){ S=data.S; if(data.cur) cur=data.cur; if(data.shown){ shown.p=data.shown.p||4; shown.f=data.shown.f||4; } }
-  build();
+  if(!CODE){ renderGate(false); return; }
+  issued(CODE).then(function(ok){
+    if(!ok){ renderGate(true); return; }
+    probeStorage();
+    load();
+    if(data&&data.S){ S=data.S; if(data.cur) cur=data.cur; if(data.shown){ shown.p=data.shown.p||4; shown.f=data.shown.f||4; } }
+    build();
+  });
 }
 try{ if(window.claude&&window.claude.use){ window.claude.use("downloads").then(function(ns){ DL=ns||null; },function(){ DL=null; }); } }catch(e){}
 try{ if(window.claude&&window.claude.hot&&window.claude.hot.snapshot){ window.claude.hot.snapshot(function(){ return {S:S,cur:cur,shown:shown}; }); } }catch(e){}
