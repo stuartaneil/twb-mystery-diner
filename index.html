@@ -266,7 +266,7 @@ var SECTIONS=[
  {h:"WALKING IN",fields:[
   {t:"text",id:"x_who",label:"Who noticed you — a quick description:",q:1},
   {t:"text",id:"x_said",label:"Exactly what they said:",q:1,quote:1},
-  {t:"single",id:"x_shown",label:"",opts:["Shown to a table","Told to order at the counter","Left to work it out"]}
+  {t:"single",id:"x_shown",label:"On arrival you were",q:1,opts:["Shown to a table","Told to order at the counter","Left to work it out"]}
  ]},
  {h:"THE FIRST",r:"60 SECONDS",fields:[
   {t:"area",id:"x_first",label:"What hit you first — smell, sound, look:",q:1}
@@ -801,7 +801,7 @@ function buildPdf(){
   function hair(){ doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.2); doc.line(M,y-0.8,PW-M,y-0.8); }
   function newPage(){
     if(page>0) doc.addPage(); page++; y=M;
-    setf(7.5,"bold",GREY); doc.text("THIRD WAVE BBQ   \u00b7   MYSTERY DINER REPORT   \u00b7   DINER "+CODE,M,12); doc.text("Page "+page+" of "+TOT,PW-M,12,{align:"right"});
+    setf(7.5,"bold",GREY); doc.text("THIRD WAVE BBQ   -   MYSTERY DINER REPORT   -   DINER "+CODE,M,12); doc.text("Page "+page+" of "+TOT,PW-M,12,{align:"right"});
     doc.setDrawColor(LINE[0],LINE[1],LINE[2]); doc.setLineWidth(0.3); doc.line(M,14.5,PW-M,14.5);
     setf(7,"normal",GREY); doc.text("Confidential - head office only",M,PH-10); doc.text("Gold Coast - Surfers Paradise",PW-M,PH-10,{align:"right"});
     y=M+6;
@@ -824,6 +824,12 @@ function buildPdf(){
     if(val==="No"){ setf(9,"bold",RED); doc.text("NO",PW-M,y+3.3,{align:"right"}); }
     else if(val==="Yes"){ setf(9,"bold",INK); doc.text("YES",PW-M,y+3.3,{align:"right"}); }
     else { setf(9,"italic",GREY); doc.text("not answered",PW-M,y+3.3,{align:"right"}); }
+    y+=h; hair();
+  }
+  function trow(label,val){
+    setf(9,"normal",INK); var ll=doc.splitTextToSize(clean(label),CW-32); var h=Math.max(1,ll.length)*LH(9)+2.6; need(h);
+    setf(9,"normal",INK); doc.text(ll,M,y+3.3);
+    if(val){ setf(9,"bold",INK); doc.text(clean(val),PW-M,y+3.3,{align:"right"}); } else { setf(9,"italic",GREY); doc.text("not recorded",PW-M,y+3.3,{align:"right"}); }
     y+=h; hair();
   }
   function rateRow(label,v,n){
@@ -863,7 +869,7 @@ function buildPdf(){
       case "rate": rateRow(lab(f),sval(id),f.max||5); break;
       case "words3": v=[1,2,3].map(function(n){ return sval(id+n); }).filter(Boolean); kv(lab(f),v.join(", ")); break;
       case "zones": f.items.forEach(function(z,i){ var b=f.id+i+"_"; kv(z,[sval(b+"clean")&&"clean "+sval(b+"clean")+" / 5", sval(b+"cond")&&"condition "+sval(b+"cond")+" / 5", sval(b+"note")].filter(Boolean).join(", ")); }); break;
-      case "clock": f.items.forEach(function(it,i){ var b=f.id+i+"_"; if(it.yn){ ynRow(it.m,sval(b+"y")); } else { kv(it.m,[sval(b+"t"),sval(b+"n")].filter(Boolean).join("  -  ")); } }); break;
+      case "clock": f.items.forEach(function(it,i){ var b=f.id+i+"_"; if(it.yn){ ynRow(it.m,sval(b+"y")); } else { trow(it.m+(sval(b+"n")?"  —  "+sval(b+"n"):""),sval(b+"t")); } }); break;
       case "repeat":
         ch=Promise.resolve();
         for(var r=0;r<shown[f.id];r++){ (function(r){ var bp=f.id+r+"_"; if(!repHas(f,bp)) return; ch=ch.then(function(){ grp(repTitle(f,r)); var c2=Promise.resolve(); f.fields.forEach(function(sf){ c2=c2.then(function(){ return pf(sf,bp); }); }); return c2; }); })(r); }
@@ -890,7 +896,7 @@ function buildPdf(){
   SECTIONS.forEach(function(s){
     if(s.send||s.id==="start") return;
     chain=chain.then(function(){
-      newPage(); band(s.num,s.title);
+      need(70); y+=4; band(s.num,s.title);
       var c=Promise.resolve();
       s.groups.forEach(function(g){ if(g.fields.every(function(f){ return f.t==="pcl"||f.t==="recall"||f.t==="rules"||f.t==="note"; })) return; c=c.then(function(){ grp(g.h+(g.r?" "+g.r:"")); var c2=Promise.resolve(); g.fields.forEach(function(f){ c2=c2.then(function(){ return pf(f,""); }); }); return c2.then(function(){ y+=2; }); }); });
       return c;
