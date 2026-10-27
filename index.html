@@ -577,10 +577,10 @@ function render(f,pfx){
 function sendHTML(){
   return '<div class="g"><div class="gh"><h2>WHERE YOU’RE <b>UP TO</b></h2><div class="note-r">Tap a section above to finish it</div></div><ul class="miss" id="miss"></ul></div>'+
   '<div class="sendbox"><h3>SEND IT IN</h3><ol class="steps">'+
-  '<li>Tap <b>Send the report</b>. Your phone’s share sheet opens with the PDF attached — every answer and photo in place.</li>'+
-  '<li>Choose <b>Mail</b> (or Gmail). Long-press the <b>To</b> field and <b>Paste</b> — the address is already copied for you.</li>'+
-  '<li>Send it to <span class="addr">'+TO+'</span></li></ol>'+
+  '<li>Tap <b>Send the report</b>.</li>'+
+  '<li>Choose <b>Mail</b> or <b>Gmail</b>, paste the address into To, send.</li></ol>'+
   '<div class="stack"><button type="button" class="btn red" id="sendbtn" disabled>Preparing your PDF…</button><div class="note" id="pdfmsg" hidden></div></div>'+
+  '<p class="note mt">To: <span class="addr">'+TO+'</span> (copied for you when you tap)</p>'+
   '<details class="alt" id="alt"><summary>No share sheet on your phone? Do it in two steps</summary><div class="stack"><button type="button" class="btn small" id="pdfbtn" disabled>Preparing your PDF…</button><a class="btn small" id="mailbtn" href="#send">Open email app with the text report</a><button type="button" class="btn small" id="copybtn">Copy the report text</button><button type="button" class="btn small" id="addrbtn">Copy the email address</button></div><p class="note mt">Save the PDF, open the email, attach the PDF from Downloads (the Files app on iPhone), send.</p></details></div>'+
   '<div class="g"><div class="gh"><h2>YOUR <b>PHOTOS</b></h2><div class="note-r">Each one carries its own caption</div></div><p class="note">If the PDF won’t save on your phone: long-press each photo, choose Save to Photos (or Download image), then attach them from your Photos app.</p><div id="gal"></div></div>'+
   '<div class="g"><div class="gh"><h2>YOUR <b>REPORT</b></h2><div class="note-r">If copying fails, select this text and copy it yourself</div></div><textarea id="report" readonly aria-label="Your report"></textarea></div>'+
