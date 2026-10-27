@@ -858,7 +858,14 @@ document.addEventListener("change",function(e){
 document.addEventListener("click",function(e){
   if(e.target.closest("#lb")){ $("#lb").hidden=true; return; }
   var lb=e.target.closest("label.chip, .rate label");
-  if(lb){ if(e.target.tagName==="INPUT") return; var r=lb.querySelector('input[type="radio"]'); if(r&&r.checked){ e.preventDefault(); r.checked=false; delete S[r.dataset.id]; lb.classList.remove("on"); save(); } return; }
+  if(lb){
+    if(e.target.tagName==="INPUT") return;
+    e.preventDefault();
+    var r=lb.querySelector('input[type="radio"]'); if(!r) return;
+    if(r.checked){ r.checked=false; delete S[r.dataset.id]; lb.classList.remove("on"); }
+    else { r.checked=true; S[r.dataset.id]=r.value; $$('input[name="'+r.name+'"]').forEach(function(x){ x.closest("label").classList.toggle("on",x.checked); }); }
+    save(); return;
+  }
   var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn");
   if(!b) return;
   if(b.dataset.now){
