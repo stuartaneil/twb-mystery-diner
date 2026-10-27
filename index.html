@@ -809,6 +809,39 @@ function buildPdf(){
   txt("MYSTERY DINER REPORT",26,"bold",INK);
   txt("Diner "+CODE+"  |  Gold Coast - Surfers Paradise  |  "+(fmtDate(sval("v_date"))||"date not given")+"  |  "+(sval("d_name")||"name not given")+"  |  built "+new Date().toLocaleString("en-AU",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}),9,"bold",GREY);
   rule(0.9); y+=3;
+  /* ---- at a glance ---- */
+  function mins(a,b){ if(!/^\d\d:\d\d$/.test(a)||!/^\d\d:\d\d$/.test(b)) return null; var m=(+b.slice(0,2))*60+(+b.slice(3))-((+a.slice(0,2))*60+(+a.slice(3))); if(m<0) m+=1440; return m; }
+  function r5(id,n){ var v=sval(id); return v?v+"/"+(n||5):"-"; }
+  function money(id){ var v=sval(id); return v?"$"+v:"-"; }
+  var yn=[];
+  function pushYN(sec,label,val){ yn.push({sec:sec,label:label,val:val}); }
+  SECTIONS.forEach(function(s){ if(s.send) return; s.groups.forEach(function(g){ g.fields.forEach(function(f){ walkYN(f,"",s.tab,""); }); }); });
+  function walkYN(f,pfx,sec,prefix){
+    if(f.t==="checks"){ f.items.forEach(function(it){ pushYN(sec,prefix+it[1],sval(pfx+it[0])); }); }
+    else if(f.t==="yn"){ pushYN(sec,prefix+f.label,sval(pfx+f.id)); }
+    else if(f.t==="clock"){ f.items.forEach(function(it,i){ if(it.yn) pushYN(sec,it.m,sval(f.id+i+"_y")); }); }
+    else if(f.t==="row"){ f.fields.forEach(function(x){ walkYN(x,pfx,sec,prefix); }); }
+    else if(f.t==="repeat"){ for(var r=0;r<shown[f.id];r++){ var bp=f.id+r+"_"; f.fields.forEach(function(sf){ walkYN(sf,bp,sec,repTitle(f,r)+" \u2014 "); }); } }
+  }
+  var nYes=yn.filter(function(x){ return x.val==="Yes"; }).length, nNo=yn.filter(function(x){ return x.val==="No"; }).length, nBlank=yn.length-nYes-nNo;
+  need(20); setf(17,"bold",INK); doc.text("AT A GLANCE",M,y+5); y+=8; rule(0.7); y+=2;
+  qa("Visit", (fmtDate(sval("v_date"))||"date not given")+"  |  arrived "+(sval("v_in")||"-")+", left "+(sval("v_out")||"-")+"  |  "+(sval("v_adults")||"-")+" adults, "+(sval("v_kids")||"0")+" kids  |  booked: "+(sval("v_booked")||"-")+"  |  receipt kept: "+(sval("v_receipt")||"-"));
+  qa("Spend", money("v_spend")+" total  |  "+money("val_head")+" per head  |  would happily have paid "+money("val_fair")+"  |  worth it "+r5("val_worth"));
+  qa("Scores", "Overall "+r5("vd_overall",10)+"  |  as a place to spend an evening "+r5("a_evening")+"  |  Instagram: photos make you hungry "+r5("o_ig_hungry")+", would pick it "+r5("o_ig_pick"));
+  qa("Food", DISHES.map(function(d,i){ var b="f"+i+"_"; return d+": "+(sval(b+"name")||"-")+" (taste "+r5(b+"taste")+", portion "+r5(b+"portion")+", again: "+(sval(b+"again")||"-")+")"; }).join("  |  "));
+  qa("Verdict", "would come back: "+(sval("vd_back")||"-")+"  |  would recommend: "+(sval("vd_rec")||"-")+"  |  against expectations: "+(sval("pr_kept")||"-")+"  |  room in three words: "+([1,2,3].map(function(n){ return sval("a_w"+n); }).filter(Boolean).join(", ")||"-"));
+  qa("Fix first", sval("vd_fix")); qa("They nailed", sval("vd_nailed"));
+  var k=function(i){ return sval("k"+i+"_t"); }, g1=mins(k(0),k(1)), g2=mins(k(2),k(3)), g3=mins(k(2),k(4));
+  qa("The clock", "drinks ordered "+(k(0)||"-")+" \u2192 on table "+(k(1)||"-")+(g1!==null?" ("+g1+" min)":"")+"  |  food ordered "+(k(2)||"-")+" \u2192 starters "+(k(3)||"-")+(g2!==null?" ("+g2+" min)":"")+" \u2192 mains "+(k(4)||"-")+(g3!==null?" ("+g3+" min after ordering)":"")+"  |  paid and out "+(k(7)||"-")+"  |  check-back: "+(sval("k5_y")||"-")+"  |  dessert offered: "+(sval("k6_y")||"-"));
+  qa("Service", "confident answer: "+(sval("s_confident")||"-")+"  |  specials offered: "+(sval("s_specials")||"-")+"  |  recommended something: "+(sval("s_rec")||"-")+(sval("s_rec_what")?" ("+sval("s_rec_what")+")":"")+"  |  could pick the manager: "+(sval("m_pick")||"-")+"  |  room felt: "+(sval("m_room")||"-"));
+  qa("Comfort", "music: "+(sval("c_music")||"-")+"  |  lighting: "+(sval("c_light")||"-")+"  |  temperature: "+(sval("c_temp")||"-")+"  |  smell: "+(sval("c_smell")||"-")+"  |  walking in: "+(sval("x_shown")||"-"));
+  var nos=yn.filter(function(x){ return x.val==="No"; });
+  qa("Yes / No answers", nYes+" yes, "+nNo+" no, "+nBlank+" left blank");
+  qa("Every NO", nos.length?nos.map(function(x){ return x.label+" ("+x.sec+")"; }).join("; "):"none");
+  var blanks=yn.filter(function(x){ return !x.val; });
+  if(blanks.length) qa("Left blank", blanks.map(function(x){ return x.label+" ("+x.sec+")"; }).join("; "));
+  qa("Photos", photoCount()+" attached, in place through the report");
+  footer(); doc.addPage(); page++; y=M;
   var chain=Promise.resolve();
   SECTIONS.forEach(function(s){
     if(s.send) return;
