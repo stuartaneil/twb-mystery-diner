@@ -43,6 +43,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tab.has .dot{display:block}
 .prog{height:3px;background:color-mix(in srgb,var(--band-fg) 15%,transparent)}
 .prog i{display:block;height:100%;background:var(--red);width:0;transition:width .3s}
+.st{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:center;padding:6px max(16px,env(safe-area-inset-left,0px)) 7px;line-height:1.3}
+.st.bad{background:var(--red);color:var(--bg);font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;padding-block:9px}
+.dn .note+.note{margin-top:8px}
 
 main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;max-width:680px;margin:0 auto}
 section[hidden]{display:none}
@@ -180,6 +183,7 @@ details.alt .stack{margin-top:10px}
   <div class="in"><div class="brand">THIRD WAVE BBQ</div><div class="sub" id="sub">Mystery diner<br>Surfers Paradise</div></div>
   <div class="strip" role="tablist" id="strip"></div>
   <div class="prog"><i id="prog"></i></div>
+  <div class="st" id="st" hidden></div>
 </div>
 <main id="main"></main>
 <div id="lb" hidden><img alt="Photo, full size"></div>
@@ -380,22 +384,38 @@ var CODE=null, ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function codeOk(c){ c=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,""); if(c.slice(0,3)!=="TWB") return null; var b=c.slice(3); if(b.length!==5) return null; var s=0; for(var i=0;i<4;i++){ var k=ALPH.indexOf(b.charAt(i)); if(k<0) return null; s+=k*(i+2); } if(ALPH.charAt(s%32)!==b.charAt(4)) return null; return "TWB-"+b; }
 function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).get("v"); }catch(e){} var c=codeOk(q)||codeOk((location.hash||"").replace(/^#/,"")); if(!c){ try{ c=codeOk(localStorage.getItem(KEY+":code")); }catch(e){} } CODE=c; if(c){ try{ localStorage.setItem(KEY+":code",c); }catch(e){} } }
 function skey(){ return KEY+":"+CODE; }
+var storageOK=true, loadedAt=0, stateT=null, INAPP=/FBAN|FBAV|Instagram|Line\/|Messenger|Twitter|TikTok|Snapchat|Slack|Teams|MicroMessenger|GSA\//i.test(navigator.userAgent);
+function probeStorage(){ try{ localStorage.setItem(KEY+":probe","1"); localStorage.removeItem(KEY+":probe"); storageOK=true; }catch(e){ storageOK=false; } try{ if(navigator.storage&&navigator.storage.persist){ navigator.storage.persist().then(function(){},function(){}); } }catch(e){} }
+function setStatus(t,bad){ var el=$("#st"); if(!el) return; el.hidden=!t; el.textContent=t||""; el.classList.toggle("bad",!!bad); }
+function whenText(ts){ return ts?new Date(ts).toLocaleString("en-AU",{weekday:"short",hour:"numeric",minute:"2-digit"}):""; }
+function bootStatus(){
+  var n=Object.keys(S).length;
+  if(!storageOK){ setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true); return; }
+  if(INAPP){ setStatus("You’re inside another app’s browser — open this link in Safari or Chrome so your answers stay saved.",true); }
+  else if(n){ setStatus("Saved on this phone"+(loadedAt?" · "+whenText(loadedAt):""),false); }
+  else { setStatus("Answers save to this browser as you type",false); }
+  if(n&&!bootStatus.done){ bootStatus.done=true; toast("Welcome back — your answers from "+(whenText(loadedAt)||"earlier")+" are still here."); }
+}
 function renderGate(){ $("#strip").hidden=true; $("#main").innerHTML='<section class="gate"><h1 class="h1">THIS FORM OPENS FROM YOUR <b>PERSONAL LINK</b></h1><div class="rule"></div><p class="note">Every mystery diner gets their own link with a diner number in it. Please open the exact link you were sent.</p><p class="note">If it isn’t working, email <span class="addr">'+TO+'</span> and we’ll sort it out.</p></section>'; }
 
 function load(){
-  try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
+  try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
 }
 function save(){
   pdfBlob=null;
   clearTimeout(saveT);
   saveT=setTimeout(function(){
-    try{ localStorage.setItem(skey(),JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now()})); setSaved(); }catch(e){}
+    var ok=false;
+    try{ localStorage.setItem(skey(),JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now()})); ok=true; }catch(e){}
+    if(ok) setSaved(); else setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true);
+    clearTimeout(stateT); stateT=setTimeout(function(){ idbPut({k:"state:"+CODE,S:S,cur:cur,shown:shown,at:Date.now()}).then(function(){},function(){}); },800);
     refresh();
   },120);
 }
 function setSaved(){
   var t=new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"});
   $$(".saved").forEach(function(e){ e.textContent="Saved on this phone · "+t; });
+  if(!INAPP) setStatus("Saved on this phone · "+t,false);
 }
 
 /* ---------- photo store (IndexedDB) ---------- */
@@ -556,7 +576,7 @@ function renderSection(s,idx){
   h+='<h1 class="h1">'+(s.num?'<b>'+s.num+'</b>':'')+esc(s.title)+'</h1>';
   if(s.lead) h+='<div class="lead">'+esc(s.lead)+'</div>';
   h+='<div class="rule"></div>';
-  if(s.id==="start") h+='<div class="dn"><span class="lab">Your diner number</span><b>'+esc(CODE)+'</b><p class="note">This number is yours alone — it ties your report to you, so please don’t pass the link on. It’s printed on your report and on every photo.</p></div>';
+  if(s.id==="start") h+='<div class="dn"><span class="lab">Your diner number</span><b>'+esc(CODE)+'</b><p class="note">This number is yours alone — it ties your report to you, so please don’t pass the link on. It’s printed on your report and on every photo.</p><p class="note">Your answers save in this browser as you type. Keep using the same browser on this phone — not a private tab — and they’ll be here when you come back.</p></div>';
   if(s.send){ h+=sendHTML(); }
   else { s.groups.forEach(function(g){ h+='<div class="g"><div class="gh"><h2>'+esc(g.h)+(g.r?' <b>'+esc(g.r)+'</b>':'')+'</h2>'+(g.note?'<div class="note-r">'+esc(g.note)+'</div>':'')+'</div>'+g.fields.map(function(f){ return render(f,""); }).join("")+'</div>'; }); }
   h+='<div class="nav">'+(idx>0?'<button type="button" class="btn" data-go="'+SECTIONS[idx-1].id+'">← '+esc(SECTIONS[idx-1].tab)+'</button>':'')+(idx<SECTIONS.length-1?'<button type="button" class="btn solid" data-go="'+SECTIONS[idx+1].id+'">'+esc(SECTIONS[idx+1].tab)+' →</button>':'')+'</div>';
@@ -574,7 +594,10 @@ function build(){
   var hsh=(location.hash||"").replace("#","");
   if(SECTIONS.some(function(s){ return s.id===hsh; })) cur=hsh;
   show(cur,true);
+  bootStatus();
   idbAll().then(function(recs){
+    var bk=(recs||[]).filter(function(r){ return r.k==="state:"+CODE; })[0];
+    if(bk&&bk.S&&Object.keys(S).length===0&&Object.keys(bk.S).length){ S=bk.S; cur=bk.cur||cur; loadedAt=bk.at||0; if(bk.shown){ shown.p=bk.shown.p||4; shown.f=bk.shown.f||4; } restore(); show(cur,true); bootStatus(); }
     (recs||[]).sort(function(a,b){ return a.at-b.at; }).forEach(function(r){ if(!SLOTMETA[r.slot]||r.code!==CODE) return; (P[r.slot]=P[r.slot]||[]).push(r); var m=/^f(\d+)_ph$/.exec(r.slot); if(m) shown.f=Math.max(shown.f,+m[1]+1); });
     restoreReps(); renderAllSlots(); refresh(); if(cur==="verdict") renderPcl(); if(cur==="send") buildSend();
   },function(){ toast("Photos can’t be stored on this phone in this browser — they will still go into the PDF while the page stays open"); });
@@ -901,6 +924,7 @@ document.addEventListener("click",function(e){
 function start(data){
   resolveCode();
   if(!CODE){ renderGate(); return; }
+  probeStorage();
   load();
   if(data&&data.S){ S=data.S; if(data.cur) cur=data.cur; if(data.shown){ shown.p=data.shown.p||4; shown.f=data.shown.f||4; } }
   build();
