@@ -904,7 +904,7 @@ function buildPdf(){
   });
   return chain.then(function(){ try{ doc.putTotalPages(TOT); }catch(e){} return doc.output("blob"); });
 }
-function mb(b){ return (b.size/1048576).toFixed(1)+" MB"; }
+function mb(b){ return b.size<1048576?Math.max(1,Math.round(b.size/1024))+" KB":(b.size/1048576).toFixed(1)+" MB"; }
 function openAlt(){ var d=$("#alt"); if(d) d.open=true; }
 function prepPdf(){
   var b1=$("#sendbtn"), b2=$("#pdfbtn"), msg=$("#pdfmsg"); if(!b1) return;
