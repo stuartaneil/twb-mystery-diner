@@ -973,7 +973,7 @@ function emailText(){
   if(sval("vd_fix")) L.push("Fix first: "+sval("vd_fix"));
   if(sval("vd_nailed")) L.push("They nailed: "+sval("vd_nailed"));
   L.push(nos.length?"Marked No ("+nos.length+"): "+nos.map(function(x){ return x.label; }).join("; "):"Nothing marked No.");
-  var tail=[money("v_spend")&&money("v_spend")+" spent",photoCount()+" photos"].filter(Boolean).join("  ·  "); if(tail) L.push(tail);
+  var tail=[money("v_spend")&&money("v_spend")+" spent",photoCount()+(photoCount()===1?" photo":" photos")].filter(Boolean).join("  ·  "); if(tail) L.push(tail);
   return L.join("\n");
 }
 function sentAt(){ try{ return +localStorage.getItem(skey()+":sent")||0; }catch(e){ return 0; } }
