@@ -1024,7 +1024,7 @@ document.addEventListener("click",function(e){
     copy(TO).then(function(ok){ toast(ok?"Address copied: "+TO:"Address: "+TO); });
   } else if(b.id==="clearbtn"){
     if(!clearArmed){ clearArmed=true; b.textContent="Tap again to clear everything"; b.classList.add("red"); setTimeout(function(){ clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); },4000); }
-    else { try{ localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:3}; invalidatePdf(); clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); toast("Cleared"); }
+    else { try{ var was=readStored(); if(was&&countS(was.S||{})>0) localStorage.setItem(skey()+":prev",JSON.stringify(was)); localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:3}; invalidatePdf(); clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); offerPrev(); toast("Cleared"); }
   }
 });
 
