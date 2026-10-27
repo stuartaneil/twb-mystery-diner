@@ -193,6 +193,7 @@ details.alt .stack{margin-top:10px}
   <div class="strip" role="tablist" id="strip"></div>
   <div class="prog"><i id="prog"></i></div>
   <div class="st" id="st" hidden></div>
+  <div class="st bad" id="st2" hidden></div>
 </div>
 <main id="main"></main>
 <div id="lb" hidden><img alt="Photo, full size"></div>
@@ -383,7 +384,7 @@ function whenText(ts){ return ts?new Date(ts).toLocaleString("en-AU",{weekday:"s
 var META=null, DBOK=null;
 function metaBump(){ try{ var m=JSON.parse(localStorage.getItem(KEY+":meta")||"null")||{first:Date.now(),n:0}; m.n++; m.last=Date.now(); localStorage.setItem(KEY+":meta",JSON.stringify(m)); META=m; }catch(e){ META=null; } }
 function browserName(){ if(INAPP) return "inside another app’s browser"; if(/CriOS/.test(UA)) return "Chrome on iPhone"; if(/FxiOS/.test(UA)) return "Firefox on iPhone"; if(/EdgiOS/.test(UA)) return "Edge on iPhone"; if(isIOS) return "Safari on iPhone"; if(/Android/.test(UA)) return (/Chrome/.test(UA)?"Chrome on Android":"Android browser"); return "desktop browser"; }
-function diag(){ var el=$("#diag"); if(!el) return; var parts=["Storage check — answers: "+(storageOK?"ok":"BLOCKED"),"photos: "+(DBOK===null?"checking":(DBOK?"ok":"BLOCKED"))]; if(META) parts.push("first opened on this phone "+new Date(META.first).toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})+", opened "+META.n+" time"+(META.n===1?"":"s")); parts.push(browserName()); el.textContent=parts.join(" · "); }
+function diag(){ var el=$("#diag"); if(!el) return; var st=readStored(); var parts=["Storage check — answers: "+(storageOK?"ok":"BLOCKED")+(st?", "+countS(st.S||{})+" stored at "+whenText(st.at):", none stored yet"),"photos: "+(DBOK===null?"checking":(DBOK?"ok":"BLOCKED"))]; if(META) parts.push("first opened on this phone "+new Date(META.first).toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})+", opened "+META.n+" time"+(META.n===1?"":"s")); parts.push(browserName()); el.textContent=parts.join(" · "); }
 function bootStatus(){
   diag();
   var n=Object.keys(S).length;
@@ -398,21 +399,32 @@ var ISSUED=["5c2941f2575cf2f6","388fb2bf808e85e5","8f90c9d20f6a189a","36eb96b8f1
 function sha256(s){ try{ if(!(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder)) return Promise.resolve(null); return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){ return Array.prototype.map.call(new Uint8Array(b),function(x){ return ("0"+x.toString(16)).slice(-2); }).join("").slice(0,16); },function(){ return null; }); }catch(e){ return Promise.resolve(null); } }
 function issued(code){ if(!ISSUED.length) return Promise.resolve(true); return sha256(code).then(function(h){ return h===null?true:ISSUED.indexOf(h)>=0; }); }
 
+var lastSeenAt=0;
+function readStored(){ try{ var j=localStorage.getItem(skey()); return j?JSON.parse(j):null; }catch(e){ return null; } }
+function readPrev(){ try{ var j=localStorage.getItem(skey()+":prev"); return j?JSON.parse(j):null; }catch(e){ return null; } }
+function countS(o){ var n=0; for(var k in o){ var v=o[k]; if(v===true||(typeof v==="string"&&v.trim()!=="")) n++; } return n; }
 function load(){
-  try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=Math.min(3,o.shown.f||3); } } }catch(e){}
+  var o=readStored();
+  if(o){ S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; lastSeenAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=Math.min(3,o.shown.f||3); } }
   var hs=hashState();
-  if(hs&&hs.code===CODE&&(hs.at||0)>loadedAt){ S=hs.S||{}; cur=hs.cur||cur; loadedAt=hs.at||0; if(hs.shown){ shown.p=hs.shown.p||4; shown.f=Math.min(3,hs.shown.f||3); } }
+  if(hs&&hs.code===CODE&&(hs.at||0)>loadedAt&&countS(hs.S||{})>=countS(S)){ S=hs.S||{}; cur=hs.cur||cur; loadedAt=hs.at||0; if(hs.shown){ shown.p=hs.shown.p||4; shown.f=Math.min(3,hs.shown.f||3); } }
 }
+function adopt(st,msg){ S=st.S||{}; cur=st.cur||cur; loadedAt=st.at||0; lastSeenAt=st.at||0; if(st.shown){ shown.p=st.shown.p||4; shown.f=Math.min(3,st.shown.f||3); } restore(); refresh(); refreshRecall(); show(cur,true); setSaved(); offerPrev(); if(msg) toast(msg); }
+function adoptIfNewer(){ if(!CODE) return; var st=readStored(); if(st&&(st.at||0)>lastSeenAt&&countS(st.S||{})>=countS(S)){ adopt(st,"Picked up your newer answers."); } }
+function offerPrev(){ var el=$("#st2"); if(!el) return; var pv=readPrev(); if(pv&&pv.S&&countS(pv.S)>countS(S)+3){ el.hidden=false; el.innerHTML='Earlier answers found — '+countS(pv.S)+' from '+whenText(pv.at)+' — <button type="button" class="lnk inv" id="restorePrev">bring them back</button>'; } else { el.hidden=true; el.innerHTML=""; } }
 function save(){ invalidatePdf(); persist(); }
 function persist(){
   clearTimeout(saveT);
   saveT=setTimeout(function(){
-    var ok=false;
-    try{ localStorage.setItem(skey(),JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now()})); ok=true; }catch(e){}
+    var stored=readStored();
+    if(stored&&(stored.at||0)>lastSeenAt&&countS(stored.S||{})>countS(S)){ adopt(stored,"Picked up your newer answers from another tab."); return; }
+    if(stored&&countS(stored.S||{})>countS(S)+3){ try{ localStorage.setItem(skey()+":prev",JSON.stringify(stored)); }catch(e){} }
+    var rec={S:S,cur:cur,shown:shown,at:Date.now()}, ok=false;
+    try{ localStorage.setItem(skey(),JSON.stringify(rec)); ok=true; lastSeenAt=rec.at; }catch(e){}
     if(ok) setSaved(); else if(!INAPP) setStatus("NOT SAVING — this browser is blocking storage. Open the link in Safari or Chrome, not inside another app or a private tab.",true);
     putHash();
-    clearTimeout(stateT); stateT=setTimeout(function(){ idbPut({k:"state:"+CODE,S:S,cur:cur,shown:shown,at:Date.now()}).then(function(){},function(){}); },800);
-    refresh();
+    clearTimeout(stateT); stateT=setTimeout(function(){ idbPut({k:"state:"+CODE,S:rec.S,cur:rec.cur,shown:rec.shown,at:rec.at}).then(function(){},function(){}); },800);
+    refresh(); offerPrev();
   },120);
 }
 function setSaved(){
@@ -600,6 +612,7 @@ function build(){
   if(SECTIONS.some(function(s){ return s.id===hsh; })) cur=hsh;
   show(cur,true);
   bootStatus();
+  offerPrev();
   if(Object.keys(S).length) persist();
   idbAll().then(function(recs){
     var bk=(recs||[]).filter(function(r){ return r.k==="state:"+CODE; })[0];
@@ -898,9 +911,10 @@ document.addEventListener("click",function(e){
     else { r.checked=true; S[r.dataset.id]=r.value; $$('input[name="'+r.name+'"]').forEach(function(x){ x.closest("label").classList.toggle("on",x.checked); }); }
     save(); return;
   }
-  var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn,#openSafari");
+  var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn,#openSafari,#restorePrev");
   if(!b) return;
   if(b.id==="openSafari"){ openInBrowser(); return; }
+  if(b.id==="restorePrev"){ var pv=readPrev(); if(pv&&pv.S){ adopt(pv,"Earlier answers restored."); persist(); } return; }
   if(b.dataset.now){
     var inp=$('[data-id="'+b.dataset.now+'"]'); var d=new Date();
     var v=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
@@ -929,6 +943,10 @@ document.addEventListener("click",function(e){
     else { try{ localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:3}; invalidatePdf(); clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); toast("Cleared"); }
   }
 });
+
+window.addEventListener("storage",function(e){ try{ if(CODE&&e.key===skey()) adoptIfNewer(); }catch(x){} });
+document.addEventListener("visibilitychange",function(){ try{ if(!document.hidden&&CODE) adoptIfNewer(); }catch(x){} });
+window.addEventListener("pageshow",function(e){ try{ if(e.persisted&&CODE) adoptIfNewer(); }catch(x){} });
 
 /* ---------- boot ---------- */
 function start(data){
