@@ -382,7 +382,7 @@ var SECTIONS=[
 var S={}, P={}, URLS={}, SLOTMETA={}, SLOTSEC={}, cur="start", shown={p:4,f:4}, grp=0, saveT=null, capT={}, clearArmed=false, curSec="", DL=null, pdfBlob=null, pdfBuilding=false;
 var CODE=null, ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function codeOk(c){ c=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,""); if(c.slice(0,3)!=="TWB") return null; var b=c.slice(3); if(b.length!==5) return null; var s=0; for(var i=0;i<4;i++){ var k=ALPH.indexOf(b.charAt(i)); if(k<0) return null; s+=k*(i+2); } if(ALPH.charAt(s%32)!==b.charAt(4)) return null; return "TWB-"+b; }
-function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).get("v"); }catch(e){} var c=codeOk(q)||codeOk((location.hash||"").replace(/^#/,"")); if(!c){ try{ c=codeOk(localStorage.getItem(KEY+":code")); }catch(e){} } CODE=c; if(c){ try{ localStorage.setItem(KEY+":code",c); }catch(e){} } }
+function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).get("v"); }catch(e){} var c=codeOk(q)||codeOk((location.hash||"").replace(/^#/,"")); if(!c){ try{ c=codeOk(localStorage.getItem(KEY+":code")); }catch(e){} } CODE=c; }
 function skey(){ return KEY+":"+CODE; }
 var pdfGen=0;
 function invalidatePdf(){ pdfBlob=null; pdfBuilding=false; pdfGen++; }
@@ -406,8 +406,8 @@ function issued(code){ if(!ISSUED.length) return Promise.resolve(true); return s
 function load(){
   try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; loadedAt=o.at||0; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
 }
-function save(){
-  invalidatePdf();
+function save(){ invalidatePdf(); persist(); }
+function persist(){
   clearTimeout(saveT);
   saveT=setTimeout(function(){
     var ok=false;
@@ -660,7 +660,7 @@ function show(id,noSave){
   if(id==="verdict") renderPcl();
   if(id==="send") buildSend();
   window.scrollTo(0,0);
-  if(!noSave) save();
+  if(!noSave) persist();
 }
 
 /* ---------- report text ---------- */
@@ -931,7 +931,8 @@ function start(data){
   resolveCode();
   if(!CODE){ renderGate(false); return; }
   issued(CODE).then(function(ok){
-    if(!ok){ renderGate(true); return; }
+    if(!ok){ try{ if(localStorage.getItem(KEY+":code")===CODE) localStorage.removeItem(KEY+":code"); }catch(e){} renderGate(true); return; }
+    try{ localStorage.setItem(KEY+":code",CODE); }catch(e){}
     probeStorage();
     load();
     if(data&&data.S){ S=data.S; if(data.cur) cur=data.cur; if(data.shown){ shown.p=data.shown.p||4; shown.f=data.shown.f||4; } }
