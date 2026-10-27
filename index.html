@@ -340,7 +340,7 @@ var SECTIONS=[
 {id:"verdict",tab:"07 Verdict",num:"07",title:"THE VERDICT",groups:[
  {h:"AMBIENCE",fields:[
   {t:"words3",id:"a_w",label:"The room in three words:",q:1},
-  {t:"rate",id:"a_evening",label:"As a place to spend an evening"}
+  {t:"rate",id:"a_evening",label:"Would you bring friends or family here?"}
  ]},
  {h:"THE PROMISE,",r:"KEPT?",fields:[
   {t:"single",id:"pr_kept",label:"Compared with what the website and Instagram led you to expect, the visit was:",q:1,opts:["Better","As expected","Worse"]},
@@ -770,7 +770,7 @@ function glance(){
   rows.push(["Would come back on own money", sval("vd_back")]);
   rows.push(["Would recommend", sval("vd_rec")]);
   rows.push(["Against expectations", sval("pr_kept")]);
-  rows.push(["Place to spend an evening", r5("a_evening")]);
+  rows.push(["Would bring friends or family", r5("a_evening")]);
   rows.push(["Worth it", r5("val_worth")]);
   rows.push(["Room in three words", [1,2,3].map(function(n){ return sval("a_w"+n); }).filter(Boolean).join(", ")]);
   rows.push(["Fix first", sval("vd_fix")]);
