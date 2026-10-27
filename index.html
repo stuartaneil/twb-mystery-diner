@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#121018">
+<title>Gold Coast Mystery Diner Form</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>
+/* Layout: the paper form reborn as a phone form. One section on screen at a time under a sticky black brand band with a scrolling section strip; photo slots sit where the paper form asked for photos; Back / Next at the foot of each section; every answer and photo autosaves to the phone. */
+:root{
+  --bg:#FBF9F5; --fg:#121018; --red:#C0392B; --muted:#6B655C; --line:#CDC5B6; --faint:#9A9284;
+  --field:#FFFFFF; --band:#121018; --band-fg:#FBF9F5; --card:rgba(18,16,24,.03);
+  --display:"Bebas Neue","Arial Narrow",Impact,"Helvetica Neue",sans-serif;
+  --body:"Barlow","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15131A; --fg:#F2EEE6; --red:#E25B4E; --muted:#ABA398; --line:#413C49; --faint:#7C7572; --field:#1F1C26; --band:#0B0A0E; --band-fg:#F2EEE6; --card:rgba(242,238,230,.04); color-scheme:dark }
+}
+:root[data-theme="dark"]{ --bg:#15131A; --fg:#F2EEE6; --red:#E25B4E; --muted:#ABA398; --line:#413C49; --faint:#7C7572; --field:#1F1C26; --band:#0B0A0E; --band-fg:#F2EEE6; --card:rgba(242,238,230,.04); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--band)}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--band);color:var(--band-fg)}
+.top .in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-size:22px;letter-spacing:.05em;line-height:1;white-space:nowrap}
+.sub{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);text-align:right;line-height:1.2}
+.sub b{color:var(--red);font-family:var(--display);font-size:15px;letter-spacing:.08em}
+.dn{border:1.5px solid var(--red);border-radius:6px;padding:12px 14px 10px;margin:0 0 22px}
+.dn b{display:block;font-family:var(--display);font-size:36px;color:var(--red);letter-spacing:.06em;line-height:1;margin:4px 0 8px}
+.dn .note{margin:0}
+.gate .note{font-size:16px;color:var(--fg)}
+[hidden]{display:none!important}
+.strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:2px 10px;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;font-family:var(--display);font-size:15px;letter-spacing:.06em;padding:8px 12px 7px;border:1px solid color-mix(in srgb,var(--band-fg) 35%,transparent);border-radius:999px;background:transparent;color:var(--band-fg);line-height:1;cursor:pointer;position:relative}
+.tab[aria-selected="true"]{background:var(--band-fg);border-color:var(--band-fg);color:var(--band)}
+.tab .dot{display:none;position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid var(--band)}
+.tab.has .dot{display:block}
+.prog{height:3px;background:color-mix(in srgb,var(--band-fg) 15%,transparent)}
+.prog i{display:block;height:100%;background:var(--red);width:0;transition:width .3s}
+
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;max-width:680px;margin:0 auto}
+section[hidden]{display:none}
+.h1{font-family:var(--display);font-size:36px;line-height:.95;letter-spacing:.02em;margin:0;font-weight:400;text-wrap:balance}
+.h1 b{color:var(--red);font-weight:400;margin-right:8px}
+.lead{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.rule{height:2px;background:var(--fg);margin:10px 0 22px}
+.g{margin:0 0 28px}
+.gh{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:1.5px solid var(--fg);padding-bottom:5px;margin-bottom:14px}
+.gh h2{font-family:var(--display);font-size:22px;letter-spacing:.03em;margin:0;line-height:1;font-weight:400}
+.gh h2 b{color:var(--red);font-weight:400}
+.note-r{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;max-width:52%;line-height:1.25}
+.note{font-size:15px;color:var(--muted);margin:0 0 14px;line-height:1.45}
+.f{display:flex;flex-direction:column;gap:6px;margin:0 0 14px;min-width:0}
+.f>label,.lab{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.f>label.q,.lab.q{font-size:16px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--fg);line-height:1.35}
+.hint{font-size:13px;color:var(--muted);min-height:1em}
+input[type=text],input[type=date],input[type=time],textarea{display:block;width:100%;min-width:0;font:inherit;font-size:16px;color:var(--fg);background:var(--field);border:1px solid var(--fg);border-radius:4px;padding:11px 12px;min-height:46px;margin:0;line-height:1.3}
+input[type=text],textarea{-webkit-appearance:none;appearance:none}
+input::placeholder,textarea::placeholder{color:var(--faint);opacity:1}
+textarea{min-height:88px;resize:none;overflow:hidden;line-height:1.4}
+input:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.aff{display:flex;align-items:center;gap:8px}
+.aff .pre,.aff .suf{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.aff input{flex:1 1 auto}
+.qi{position:relative}
+.qi::before{content:"\201C";position:absolute;left:11px;top:3px;font-family:var(--display);font-size:30px;color:var(--red);line-height:1;pointer-events:none}
+.qi input{padding-left:32px}
+.now{flex:0 0 auto;font-family:var(--display);font-size:15px;letter-spacing:.08em;padding:0 13px;min-height:46px;border:1.5px solid var(--red);color:var(--red);background:transparent;border-radius:4px;cursor:pointer;line-height:1}
+.now:active{background:var(--red);color:var(--bg)}
+
+.cks{display:grid;grid-template-columns:1fr;gap:0 24px;margin:0 0 14px}
+@media (min-width:560px){.cks{grid-template-columns:1fr 1fr}}
+.ck{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:16px;line-height:1.3;margin:0}
+.ck input{-webkit-appearance:none;appearance:none;flex:0 0 auto;width:24px;height:24px;margin:0;border:1.5px solid var(--fg);border-radius:3px;background:var(--field);position:relative;cursor:pointer}
+.ck input:checked{background:var(--red);border-color:var(--red)}
+.ck input:checked::after{content:"";position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid var(--bg);border-width:0 3px 3px 0;transform:rotate(45deg)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex;align-items:center;min-height:42px;padding:2px 14px 0;border:1.5px solid var(--red);border-radius:4px;color:var(--red);font-family:var(--display);font-size:17px;letter-spacing:.05em;cursor:pointer;user-select:none;-webkit-user-select:none;line-height:1}
+.chip input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.chip.on{background:var(--red);color:var(--bg)}
+
+.rl{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;padding:8px 0 12px;border-bottom:1px solid var(--line);margin:0 0 10px}
+.rl .q{flex:1 1 200px;font-size:16px;line-height:1.35}
+.rate{display:grid;grid-template-columns:repeat(5,44px);gap:8px}
+.rate label{position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1.5px solid var(--fg);border-radius:50%;font-weight:700;font-size:15px;cursor:pointer;user-select:none;-webkit-user-select:none;font-variant-numeric:tabular-nums;margin:0}
+.rate input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.rate label.on{background:var(--fg);color:var(--bg)}
+
+.card{border:1.5px solid var(--fg);border-radius:6px;padding:14px 14px 2px;margin:0 0 14px;background:var(--card);min-width:0}
+.card .ct{font-family:var(--display);font-size:19px;letter-spacing:.04em;margin:0 0 10px;line-height:1}
+.card .ck:last-of-type{border-bottom:0}
+.rep[hidden]{display:none}
+
+.mo{padding:10px 0;border-bottom:1px solid var(--line)}
+.mo .ml{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;margin-bottom:6px;gap:8px}
+.mo .ml i{font-style:normal;font-size:11px;color:var(--faint);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.mo .mr{display:flex;gap:8px;align-items:center}
+.mo input[type=time]{flex:0 0 8.4em;width:8.4em}
+.mo input[type=text]{flex:1 1 40px;min-width:0}
+
+/* photo slots */
+.ph{border:1.5px dashed var(--fg);border-radius:6px;padding:10px;background:var(--card)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-bottom:8px}
+.thumbs.list{grid-template-columns:1fr}
+.thumbs:empty{display:none}
+.th{position:relative;border-radius:4px;overflow:hidden;background:var(--line)}
+.th img{display:block;width:100%;aspect-ratio:1;object-fit:cover;cursor:zoom-in}
+.th .x{position:absolute;top:4px;right:4px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:20px;line-height:1;cursor:pointer;padding:0}
+.th.row{display:grid;grid-template-columns:96px 1fr;gap:8px;background:transparent;overflow:visible;align-items:center}
+.th.row img{border-radius:4px}
+.th.row .x{right:auto;left:62px}
+.th.row .cap{margin:0}
+.addph{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;border:1.5px solid var(--red);border-radius:4px;color:var(--red);font-family:var(--display);font-size:17px;letter-spacing:.06em;cursor:pointer;line-height:1;padding:2px 10px 0}
+.addph input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.addph svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;flex:0 0 auto;margin-top:-2px}
+.addph[hidden]{display:none}
+.busy{font-size:13px;color:var(--muted);margin-top:6px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#lb[hidden]{display:none}
+#lb img{max-width:100%;max-height:100%;object-fit:contain}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gal figure{margin:0;min-width:0}
+.gal img{display:block;width:100%;border-radius:4px}
+.gal figcaption{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.3}
+.lnk{background:none;border:0;color:var(--red);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+
+.rules{list-style:none;padding:0;margin:0 0 10px}
+.rules li{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;font-size:16px;line-height:1.35;border-bottom:1px solid var(--line)}
+.rules li b{font-family:var(--display);color:var(--red);font-size:21px;line-height:1;font-weight:400;padding-top:1px}
+.recall{border-left:3px solid var(--red);padding:8px 12px;margin:0;font-style:italic;color:var(--muted);white-space:pre-wrap;line-height:1.4}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:3px 20px 0;border-radius:4px;border:1.5px solid var(--fg);background:transparent;color:var(--fg);font-family:var(--display);font-size:19px;letter-spacing:.06em;cursor:pointer;text-decoration:none;line-height:1;text-align:center}
+.btn.solid{background:var(--fg);color:var(--bg)}
+.btn.red{background:var(--red);border-color:var(--red);color:var(--bg)}
+.btn.small{min-height:44px;font-size:16px;padding:2px 14px 0}
+.btn[hidden]{display:none}
+.btn:disabled{opacity:.55;cursor:default}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:16px;border-top:2px solid var(--fg)}
+.nav .btn{flex:1 1 0;min-width:0}
+.saved{text-align:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-top:14px;min-height:1em}
+.conf{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:flex;justify-content:space-between;gap:12px;margin-top:28px}
+
+.sendbox{border:2px solid var(--red);border-radius:6px;padding:16px;margin:0 0 24px}
+.sendbox h3{font-family:var(--display);font-size:28px;color:var(--red);margin:0 0 8px;letter-spacing:.04em;font-weight:400;line-height:1}
+.steps{margin:0 0 16px;padding-left:22px}
+.steps li{margin:0 0 7px;line-height:1.4}
+.addr{font-weight:700;word-break:break-all;user-select:all;-webkit-user-select:all}
+.stack{display:flex;flex-direction:column;gap:10px}
+.miss{margin:0 0 6px;padding:0;list-style:none}
+.miss li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.miss li span:last-child{font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.miss li.ok span:last-child{color:var(--red);font-weight:700}
+.note.mt{margin-top:12px;margin-bottom:0}
+details.alt{margin-top:16px;border-top:1px solid var(--line);padding-top:8px}
+details.alt summary{cursor:pointer;font-weight:700;color:var(--red);font-size:15px;list-style:none;padding:6px 0}
+details.alt summary::-webkit-details-marker{display:none}
+details.alt summary::before{content:"+ "}
+details.alt[open] summary::before{content:"\2013 "}
+details.alt .stack{margin-top:10px}
+#report{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;min-height:240px;max-height:60vh;overflow:auto;white-space:pre-wrap;line-height:1.35;resize:vertical}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:11px 16px;border-radius:4px;font-size:14px;line-height:1.35;z-index:40;opacity:0;transition:opacity .2s;pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<div class="top">
+  <div class="in"><div class="brand">THIRD WAVE BBQ</div><div class="sub" id="sub">Mystery diner<br>Surfers Paradise</div></div>
+  <div class="strip" role="tablist" id="strip"></div>
+  <div class="prog"><i id="prog"></i></div>
+</div>
+<main id="main"></main>
+<div id="lb" hidden><img alt="Photo, full size"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+"use strict";
+var TO="stuart@thirdwavebbq.com.au";
+var KEY="twb-md-surfers-v1";
+var MAXPX=1800, JPGQ=0.8;
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+
+var RULES=[
+ "Please book, order and pay like any other customer — and keep who you are to yourself.",
+ "Please take every photo the form asks for — discreetly, no flash. Each section has its own photo spots.",
+ "Jot down times and exact words as they happen — opinions can wait for the pages that ask.",
+ "Please order broadly: a platter or tray, sides, dessert and a couple of rounds of drinks.",
+ "If you can, visit the toilets twice — once early, once before you leave.",
+ "Please send everything back within 24 hours, while it’s fresh."
+];
+var CLOCK=["Walked in","First acknowledged","Seated","Drinks order taken","Drinks on the table","Food order taken","Starters on the table","Mains on the table","Check-back on the food","Empty plates cleared","Second round offered","Dessert offered","Bill asked for","Bill on the table","Paid and out the door"];
+var ZONES=["Entry and waiting area","Dining room floor","Your table and seating","Cutlery, caddies and menus","Bar and drinks area","The pass and kitchen sightline","Toilets — early visit","Toilets — before leaving"];
+var REPMAX={p:8,f:8};
+
+var SECTIONS=[
+{id:"start",tab:"Start",title:"MYSTERY DINER REPORT",lead:"Gold Coast · Surfers Paradise · Confidential",groups:[
+ {h:"HOW THIS",r:"WORKS",fields:[
+  {t:"rules",items:RULES},
+  {t:"note",text:"Everything you type and every photo you add stays on this phone until you send it — close the page and come back any time during your visit."}
+ ]},
+ {h:"YOUR",r:"VISIT",fields:[
+  {t:"date",id:"v_date",label:"Date",day:1},
+  {t:"row",fields:[{t:"time",id:"v_in",label:"Arrived",now:1},{t:"time",id:"v_out",label:"Left",now:1}]},
+  {t:"row",fields:[{t:"num",id:"v_adults",label:"Adults",mode:"numeric"},{t:"num",id:"v_kids",label:"Kids",mode:"numeric"}]},
+  {t:"single",id:"v_booked",label:"Booked",opts:["Walk-in","Online","Phone"]},
+  {t:"num",id:"v_spend",label:"Total spend",pre:"$",mode:"decimal"},
+  {t:"checks",items:[["v_receipt","Receipt kept"]]}
+ ]},
+ {h:"YOUR",r:"DETAILS",fields:[
+  {t:"text",id:"d_name",label:"Name"},
+  {t:"text",id:"d_contact",label:"Phone / email"}
+ ]}
+]},
+{id:"online",tab:"01 Online",num:"01",title:"BEFORE YOU GO — ONLINE",groups:[
+ {h:"GOOGLE",fields:[
+  {t:"num",id:"o_stars",label:"Star rating showing today",suf:"/ 5",mode:"decimal"},
+  {t:"area",id:"o_complaint",label:"Please read the five newest reviews. The complaint that keeps coming up:",q:1},
+  {t:"area",id:"o_praise",label:"The praise that keeps coming up:",q:1}
+ ]},
+ {h:"WEBSITE",fields:[
+  {t:"checks",items:[["o_w_search","Found it on the first search"],["o_w_hours","Opening hours easy to find"],["o_w_menu","Menu with prices"],["o_w_booking","Online booking worked"]]},
+  {t:"area",id:"o_w_broken",label:"Anything out of date or broken:",q:1}
+ ]},
+ {h:"INSTAGRAM",fields:[
+  {t:"date",id:"o_ig_date",label:"Date of the most recent post"},
+  {t:"rate",id:"o_ig_hungry",label:"The food photos make you hungry"},
+  {t:"rate",id:"o_ig_pick",label:"Looks like a place you would pick yourself"}
+ ]},
+ {h:"THE",r:"PROMISE",fields:[
+  {t:"area",id:"o_promise",label:"After all of the above — what are you expecting this venue to be like? You’ll answer against this on the Verdict page (07).",q:1}
+ ]},
+ {h:"IF YOU BOOKED",fields:[
+  {t:"checks",items:[["o_b_fast","Done in under two minutes"],["o_b_conf","Confirmation arrived"],["o_b_details","Details right on arrival — name, party size"],["o_b_occasion","Asked about the occasion or seating"]]}
+ ]}
+]},
+{id:"outside",tab:"02 Outside",num:"02",title:"OUTSIDE & ARRIVAL",groups:[
+ {h:"THE SHOPFRONT",note:"Photos — shopfront · signage · entry",fields:[
+  {t:"checks",items:[["x_sign","Signage clean and working"],["x_glass","Windows and glass clean"],["x_decals","Window decals intact, not peeling"],["x_path","Footpath swept — no butts, no grease"],["x_menu","Menu displayed and current"],["x_hours","Opening hours visible"],["x_lights","Outside lights all working"],["x_entry","Entry clear — no clutter or crates"],["x_bins","Bins out of sight"],["x_furn","Outdoor furniture straight and clean"]]},
+  {t:"area",id:"x_faded",label:"Anything faded, broken or dirty:",q:1},
+  {t:"photo",id:"ph_front",label:"Shopfront, straight on",max:2},
+  {t:"photo",id:"ph_sign",label:"Signage",max:2},
+  {t:"photo",id:"ph_entry",label:"Entry",max:2}
+ ]},
+ {h:"WALKING IN",note:"Times go on The Clock (05)",fields:[
+  {t:"text",id:"x_who",label:"Who noticed you — a quick description:",q:1},
+  {t:"text",id:"x_said",label:"Exactly what they said:",q:1,quote:1},
+  {t:"single",id:"x_shown",label:"",opts:["Shown to a table","Told to order at the counter","Left to work it out"]}
+ ]},
+ {h:"THE FIRST",r:"60 SECONDS",fields:[
+  {t:"area",id:"x_first",label:"What hit you first — smell, sound, look:",q:1}
+ ]}
+]},
+{id:"inside",tab:"03 Inside",num:"03",title:"INSIDE THE VENUE",groups:[
+ {h:"ZONE BY ZONE",note:"Photos — dining room · your table · toilets",fields:[
+  {t:"zones",id:"z",items:ZONES}
+ ]},
+ {h:"PHOTOS",r:"INSIDE",note:"Discreetly — no flash",fields:[
+  {t:"photo",id:"ph_room",label:"Dining room, wide",max:3},
+  {t:"photo",id:"ph_table",label:"Your table setting",max:2},
+  {t:"photo",id:"ph_toilets",label:"Toilets",max:4}
+ ]},
+ {h:"TOILETS, CLOSE UP",fields:[
+  {t:"checks",items:[["t_stock","Paper, soap and towel stocked"],["t_smell","Smells clean"],["t_bin","Bin not overflowing"],["t_flush","Everything flushes and runs hot"]]}
+ ]},
+ {h:"COMFORT",fields:[
+  {t:"single",id:"c_music",label:"Music",opts:["Fits the room","Too loud to talk","None playing"]},
+  {t:"single",id:"c_light",label:"Lighting",opts:["Comfortable","Too dark","Too bright"]},
+  {t:"single",id:"c_temp",label:"Temperature",opts:["Comfortable","Too hot","Too cold"]},
+  {t:"single",id:"c_smell",label:"Smell",opts:["BBQ smoke","Nothing","Grease or cleaning products"]},
+  {t:"area",id:"c_touch",label:"Anything you touched that let it down — wobbly, sticky, chipped:",q:1}
+ ]}
+]},
+{id:"staff",tab:"04 Staff",num:"04",title:"STAFF & SERVICE",groups:[
+ {h:"EVERYONE YOU DEALT WITH",note:"No need for names — “tall, beard, ran the floor” is perfect",fields:[
+  {t:"repeat",id:"p",title:"Person",add:"Add another person",fields:[
+   {t:"text",id:"who",label:"Who — describe them"},
+   {t:"text",id:"did",label:"What they did"},
+   {t:"text",id:"said",label:"Exactly what they said",quote:1},
+   {t:"rate",id:"r",label:"Out of 5"}
+  ]}
+ ]},
+ {h:"TAKING YOUR ORDER",fields:[
+  {t:"note",text:"Please ask one menu question — “what’s the brisket like?” works nicely."},
+  {t:"checks",items:[["s_confident","Confident answer, no guessing"],["s_specials","Specials or favourites offered unprompted"],["s_rec","Recommended something"]]},
+  {t:"text",id:"s_rec_what",label:"What they recommended:",q:1}
+ ]},
+ {h:"OFFERED",r:"WITHOUT YOU ASKING",fields:[
+  {t:"checks",items:[["u_drinks","Drinks as you sat down"],["u_round","Another round when glasses were low"],["u_sides","Sides with the mains"],["u_upgrade","A bigger cut or an upgrade"],["u_dessert","Dessert"],["u_takehome","Anything to take home"]]}
+ ]},
+ {h:"IN THEIR EXACT WORDS",fields:[
+  {t:"text",id:"w_order",label:"Taking the order",quote:1},
+  {t:"text",id:"w_food",label:"Dropping the food",quote:1},
+  {t:"text",id:"w_bill",label:"Bringing the bill",quote:1}
+ ]},
+ {h:"THE MANAGER",fields:[
+  {t:"single",id:"m_pick",label:"Could you pick who was running the room?",q:1,opts:["Yes","No"]},
+  {t:"text",id:"m_how",label:"What gave it away — where they were, what they were doing:",q:1},
+  {t:"checks",items:[["m_visit","They passed or visited your table"]]},
+  {t:"single",id:"m_room",label:"Room felt",opts:["Calm and worked","Rushed","Flat / idle"]}
+ ]}
+]},
+{id:"clock",tab:"05 Clock",num:"05",title:"THE CLOCK",groups:[
+ {h:"EVERY",r:"MOMENT",note:"Tap NOW as it happens",fields:[
+  {t:"note",text:"Please note each time as it happens. If something never happened, just leave the row blank — a blank tells us plenty."},
+  {t:"clock",id:"k",items:CLOCK}
+ ]},
+ {h:"WAITING",fields:[
+  {t:"text",id:"k_twice",label:"Anything you had to ask for twice:",q:1},
+  {t:"num",id:"k_longest",label:"Longest you sat with empty glasses or dirty plates",q:1,suf:"min",mode:"numeric"}
+ ]}
+]},
+{id:"food",tab:"06 Food",num:"06",title:"FOOD & DRINK",groups:[
+ {h:"WHAT YOU ATE",note:"Photograph each plate, top-down, as it lands",fields:[
+  {t:"repeat",id:"f",title:"Dish",add:"Add another dish",fields:[
+   {t:"text",id:"name",label:"Dish"},
+   {t:"photo",id:"ph",label:"This plate, top-down, as it lands",max:2},
+   {t:"checks",items:[["hot","Hot when it landed"],["photo","Looked like the menu photo"]]},
+   {t:"rate",id:"taste",label:"Taste"},
+   {t:"rate",id:"portion",label:"Portion"},
+   {t:"checks",items:[["again","Would order it again"]]},
+   {t:"text",id:"note",label:"Notes"}
+  ]}
+ ]},
+ {h:"DRINKS",fields:[
+  {t:"checks",items:[["dr_glass","Right drink, right glass"],["dr_temp","Cold ones cold, hot ones hot"],["dr_look","Looked as it should — garnish, pour, head"]]},
+  {t:"text",id:"dr_note",label:"Anything to add about the drinks:",q:1},
+  {t:"photo",id:"ph_drinks",label:"Drinks",max:3}
+ ]},
+ {h:"VALUE",fields:[
+  {t:"num",id:"val_head",label:"Spend per head",pre:"$",mode:"decimal"},
+  {t:"rate",id:"val_worth",label:"Worth it"},
+  {t:"num",id:"val_fair",label:"What you would happily have paid for what you got",q:1,pre:"$",mode:"decimal"}
+ ]}
+]},
+{id:"verdict",tab:"07 Verdict",num:"07",title:"THE VERDICT",groups:[
+ {h:"AMBIENCE",fields:[
+  {t:"words3",id:"a_w",label:"The room in three words:",q:1},
+  {t:"rate",id:"a_evening",label:"As a place to spend an evening"}
+ ]},
+ {h:"THE PROMISE,",r:"KEPT?",fields:[
+  {t:"recall",from:"o_promise",label:"What you expected, from the Online page (01)"},
+  {t:"single",id:"pr_kept",label:"The visit was:",q:1,opts:["Better","As promised","Worse"]},
+  {t:"area",id:"pr_diff",label:"What was different:",q:1}
+ ]},
+ {h:"THE VERDICT",fields:[
+  {t:"rate",id:"vd_overall",label:"Overall, out of 10",max:10},
+  {t:"checks",items:[["vd_back","I would come back on my own money"],["vd_rec","I would recommend it"]]},
+  {t:"text",id:"vd_fix",label:"The one thing to fix first:",q:1},
+  {t:"text",id:"vd_nailed",label:"The one thing they nailed:",q:1}
+ ]},
+ {h:"PHOTO",r:"EVIDENCE",fields:[
+  {t:"photo",id:"ph_bill",label:"The bill or receipt",max:2},
+  {t:"photo",id:"ph_broken",label:"Anything broken, dirty or faded",max:8,cap:1}
+ ]},
+ {h:"PHOTO",r:"CHECKLIST",note:"Fills itself in as you add photos",fields:[
+  {t:"pcl"}
+ ]}
+]},
+{id:"send",tab:"Send",title:"SEND IT IN",lead:"Within 24 hours of your visit, while it’s fresh",send:true}
+];
+
+var S={}, P={}, URLS={}, SLOTMETA={}, SLOTSEC={}, cur="start", shown={p:4,f:4}, grp=0, saveT=null, capT={}, clearArmed=false, curSec="", DL=null, pdfBlob=null, pdfBuilding=false;
+var CODE=null, ALPH="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function codeOk(c){ c=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,""); if(c.slice(0,3)!=="TWB") return null; var b=c.slice(3); if(b.length!==5) return null; var s=0; for(var i=0;i<4;i++){ var k=ALPH.indexOf(b.charAt(i)); if(k<0) return null; s+=k*(i+2); } if(ALPH.charAt(s%32)!==b.charAt(4)) return null; return "TWB-"+b; }
+function resolveCode(){ var q=null; try{ q=new URLSearchParams(location.search).get("v"); }catch(e){} var c=codeOk(q)||codeOk((location.hash||"").replace(/^#/,"")); if(!c){ try{ c=codeOk(localStorage.getItem(KEY+":code")); }catch(e){} } CODE=c; if(c){ try{ localStorage.setItem(KEY+":code",c); }catch(e){} } }
+function skey(){ return KEY+":"+CODE; }
+function renderGate(){ $("#strip").hidden=true; $("#main").innerHTML='<section class="gate"><h1 class="h1">THIS FORM OPENS FROM YOUR <b>PERSONAL LINK</b></h1><div class="rule"></div><p class="note">Every mystery diner gets their own link with a diner number in it. Please open the exact link you were sent.</p><p class="note">If it isn’t working, email <span class="addr">'+TO+'</span> and we’ll sort it out.</p></section>'; }
+
+function load(){
+  try{ var j=localStorage.getItem(skey()); if(j){ var o=JSON.parse(j); S=o.S||{}; cur=o.cur||"start"; if(o.shown){ shown.p=o.shown.p||4; shown.f=o.shown.f||4; } } }catch(e){}
+}
+function save(){
+  pdfBlob=null;
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    try{ localStorage.setItem(skey(),JSON.stringify({S:S,cur:cur,shown:shown,at:Date.now()})); setSaved(); }catch(e){}
+    refresh();
+  },120);
+}
+function setSaved(){
+  var t=new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"});
+  $$(".saved").forEach(function(e){ e.textContent="Saved on this phone · "+t; });
+}
+
+/* ---------- photo store (IndexedDB) ---------- */
+var DBP=null;
+function dbOpen(){
+  if(DBP) return DBP;
+  DBP=new Promise(function(res,rej){
+    try{ var r=indexedDB.open("twb-md-surfers",1);
+      r.onupgradeneeded=function(){ r.result.createObjectStore("photos",{keyPath:"k"}); };
+      r.onsuccess=function(){ res(r.result); }; r.onerror=function(){ rej(r.error); }; r.onblocked=function(){ rej(new Error("blocked")); };
+    }catch(e){ rej(e); }
+  });
+  return DBP;
+}
+function tx(mode,fn){
+  return dbOpen().then(function(d){ return new Promise(function(res,rej){
+    var t=d.transaction("photos",mode), st=t.objectStore("photos"), out=fn(st);
+    t.oncomplete=function(){ res(out?out.result:undefined); }; t.onerror=function(){ rej(t.error); }; t.onabort=function(){ rej(t.error); };
+  }); });
+}
+function idbPut(rec){ return tx("readwrite",function(st){ st.put(rec); }); }
+function idbDel(k){ return tx("readwrite",function(st){ st["delete"](k); }); }
+function idbAll(){ return tx("readonly",function(st){ return st.getAll(); }); }
+function idbClear(){ return tx("readwrite",function(st){ st.clear(); }); }
+
+function findRec(k){ var slot=k.split(":")[0]; return (P[slot]||[]).filter(function(r){ return r.k===k; })[0]; }
+function objUrl(rec){ if(!URLS[rec.k]){ try{ URLS[rec.k]=URL.createObjectURL(rec.blob); }catch(e){ URLS[rec.k]=rec.thumb; } } return URLS[rec.k]; }
+function slotLabel(id){ var m=/^f(\d+)_ph$/.exec(id); if(m){ var nm=sval("f"+m[1]+"_name"); return "Dish "+(+m[1]+1)+(nm?" — "+nm:""); } return (SLOTMETA[id]||{}).label||id; }
+function allSlots(){ var out=[]; Object.keys(SLOTMETA).forEach(function(id){ var m=/^f(\d+)_ph$/.exec(id); if(m&&+m[1]>=shown.f) return; out.push({id:id,label:slotLabel(id),sec:SLOTSEC[id]}); }); return out; }
+function stampText(slot){ return "THIRD WAVE BBQ · "+CODE+" · "+slotLabel(slot)+" · "+new Date().toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}); }
+
+function loadImage(file){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onload=function(){ res({img:img,url:url}); }; img.onerror=function(){ URL.revokeObjectURL(url); rej(new Error("decode")); };
+    img.src=url;
+  });
+}
+function toBlob(c,q){ return new Promise(function(res,rej){ try{ c.toBlob(function(b){ b?res(b):rej(new Error("blob")); },"image/jpeg",q); }catch(e){ rej(e); } }); }
+function processPhoto(slot,file){
+  return loadImage(file).then(function(o){
+    var img=o.img, w=img.naturalWidth, h=img.naturalHeight;
+    if(!w||!h) throw new Error("empty");
+    var sc=Math.min(1,MAXPX/Math.max(w,h)), W=Math.round(w*sc), H=Math.round(h*sc);
+    var c=document.createElement("canvas"); c.width=W; c.height=H; var x=c.getContext("2d");
+    x.drawImage(img,0,0,W,H);
+    var cap=stampText(slot), fs=Math.max(16,Math.round(Math.max(W,H)*0.017)), pad=Math.round(fs*0.6);
+    x.font="600 "+fs+"px Helvetica, Arial, sans-serif";
+    var tw=x.measureText(cap).width; if(tw>W-pad*2){ fs=Math.max(13,Math.floor(fs*(W-pad*2)/tw)); pad=Math.round(fs*0.6); x.font="600 "+fs+"px Helvetica, Arial, sans-serif"; }
+    while(x.measureText(cap).width>W-pad*2&&cap.length>12){ cap=cap.slice(0,-4)+"…"; }
+    var bh=fs+pad*2;
+    x.fillStyle="rgba(0,0,0,.58)"; x.fillRect(0,H-bh,W,bh);
+    x.fillStyle="#fff"; x.textBaseline="middle";
+    x.fillText(cap,pad,H-bh/2);
+    URL.revokeObjectURL(o.url);
+    var ts=Math.min(1,360/Math.max(W,H)), tc=document.createElement("canvas"); tc.width=Math.max(1,Math.round(W*ts)); tc.height=Math.max(1,Math.round(H*ts));
+    tc.getContext("2d").drawImage(c,0,0,tc.width,tc.height);
+    var thumb=tc.toDataURL("image/jpeg",0.72);
+    return toBlob(c,JPGQ).then(function(blob){ return {k:slot+":"+Date.now()+":"+Math.random().toString(36).slice(2,7),slot:slot,code:CODE,blob:blob,thumb:thumb,w:W,h:H,at:Date.now(),cap:""}; });
+  });
+}
+function addPhotos(slot,files){
+  var meta=SLOTMETA[slot]||{max:3}, box=$('.ph[data-slot="'+slot+'"]'), busy=box?$(".busy",box):null;
+  var list=P[slot]||[]; var room=meta.max-list.length;
+  if(room<=0){ toast("That spot is full — remove one first"); return; }
+  files=files.slice(0,room);
+  if(busy){ busy.textContent="Adding "+files.length+" photo"+(files.length>1?"s":"")+"…"; busy.hidden=false; }
+  var chain=Promise.resolve(), okN=0, badN=0;
+  files.forEach(function(f){
+    chain=chain.then(function(){ return processPhoto(slot,f).then(function(rec){ P[slot]=(P[slot]||[]).concat([rec]); renderSlot(slot); return idbPut(rec).then(function(){ okN++; },function(){ okN++; toast("Saved to the page but not the phone — send before closing"); }); },function(){ badN++; }); });
+  });
+  chain.then(function(){ if(busy) busy.hidden=true; if(badN) toast(badN+" photo"+(badN>1?"s":"")+" couldn’t be read — try a JPEG"); else if(okN) toast(okN>1?okN+" photos added":"Photo added"); save(); if(cur==="verdict") renderPcl(); });
+}
+function removePhoto(k){
+  var slot=k.split(":")[0]; P[slot]=(P[slot]||[]).filter(function(r){ return r.k!==k; });
+  idbDel(k).catch(function(){}); renderSlot(slot); save(); if(cur==="verdict") renderPcl(); toast("Photo removed");
+}
+function setCap(k,v){ var rec=findRec(k); if(!rec) return; rec.cap=v; clearTimeout(capT[k]); capT[k]=setTimeout(function(){ idbPut(rec).catch(function(){}); },400); pdfBlob=null; }
+
+function renderSlot(id){
+  var box=$('.ph[data-slot="'+id+'"]'); if(!box) return;
+  var meta=SLOTMETA[id], list=P[id]||[];
+  $(".thumbs",box).innerHTML=list.map(function(r){ return '<div class="th'+(meta.cap?' row':'')+'"><img src="'+r.thumb+'" alt="" data-view="'+r.k+'"><button type="button" class="x" data-del="'+r.k+'" aria-label="Remove photo">×</button>'+(meta.cap?'<input type="text" class="cap" data-cap="'+r.k+'" placeholder="What is it?" value="'+esc(r.cap||"")+'" autocomplete="off">':'')+'</div>'; }).join("");
+  var add=$(".addph",box); add.hidden=list.length>=meta.max;
+  $("span",add).textContent=list.length?"Add another ("+list.length+" of "+meta.max+")":"Add photo";
+}
+function renderAllSlots(){ Object.keys(SLOTMETA).forEach(renderSlot); }
+function photoCount(){ var n=0; allSlots().forEach(function(s){ n+=(P[s.id]||[]).length; }); return n; }
+function renderPcl(){
+  var el=$("#pcl"); if(!el) return;
+  el.innerHTML=allSlots().map(function(s){ var n=(P[s.id]||[]).length; return '<li'+(n?' class="ok"':'')+'><span>'+esc(s.label)+'</span><span>'+(n?n+(n>1?" photos":" photo"):'<button type="button" class="lnk" data-go="'+s.sec+'">none yet · go</button>')+'</span></li>'; }).join("");
+}
+
+/* ---------- render ---------- */
+function labelHTML(f,id){ return '<label for="i_'+id+'"'+(f.q?' class="q"':'')+'>'+esc(f.label)+'</label>'; }
+function fText(f,id){
+  var inp='<input type="text" id="i_'+id+'" data-id="'+id+'" autocomplete="off" autocapitalize="sentences">';
+  return '<div class="f">'+labelHTML(f,id)+(f.quote?'<div class="qi">'+inp+'</div>':inp)+'</div>';
+}
+function fArea(f,id){ return '<div class="f">'+labelHTML(f,id)+'<textarea id="i_'+id+'" data-id="'+id+'" rows="3" autocapitalize="sentences"></textarea></div>'; }
+function fDate(f,id){ return '<div class="f">'+labelHTML(f,id)+'<input type="date" id="i_'+id+'" data-id="'+id+'">'+(f.day?'<span class="hint" id="h_'+id+'"></span>':'')+'</div>'; }
+function fTime(f,id){ return '<div class="f">'+labelHTML(f,id)+'<div class="aff"><input type="time" id="i_'+id+'" data-id="'+id+'">'+(f.now?'<button type="button" class="now" data-now="'+id+'">Now</button>':'')+'</div></div>'; }
+function fNum(f,id){ return '<div class="f">'+labelHTML(f,id)+'<div class="aff">'+(f.pre?'<span class="pre">'+esc(f.pre)+'</span>':'')+'<input type="text" inputmode="'+(f.mode||"decimal")+'" id="i_'+id+'" data-id="'+id+'" autocomplete="off">'+(f.suf?'<span class="suf">'+esc(f.suf)+'</span>':'')+'</div></div>'; }
+function fChecks(f,pfx){ return '<div class="cks" data-grp="g'+(grp++)+'">'+f.items.map(function(it){ return '<label class="ck"><input type="checkbox" data-id="'+pfx+it[0]+'"><span>'+esc(it[1])+'</span></label>'; }).join("")+'</div>'; }
+function fSingle(f,id){ return '<div class="f">'+(f.label?'<span class="lab'+(f.q?' q':'')+'">'+esc(f.label)+'</span>':'')+'<div class="chips">'+f.opts.map(function(o){ return '<label class="chip"><input type="radio" name="'+id+'" value="'+esc(o)+'" data-id="'+id+'">'+esc(o)+'</label>'; }).join("")+'</div></div>'; }
+function fRate(f,id){ var n=f.max||5, h=''; for(var v=1;v<=n;v++){ h+='<label><input type="radio" name="'+id+'" value="'+v+'" data-id="'+id+'">'+v+'</label>'; } return '<div class="rl"><span class="q">'+esc(f.label)+'</span><div class="rate">'+h+'</div></div>'; }
+function fZones(f){ return f.items.map(function(z,i){ var b=f.id+i+"_"; return '<div class="card"><div class="ct">'+esc(z)+'</div>'+fRate({label:"Clean"},b+"clean")+fRate({label:"Condition"},b+"cond")+fText({label:"What let it down"},b+"note")+'</div>'; }).join(""); }
+function fClock(f){ return f.items.map(function(m,i){ var b=f.id+i+"_"; return '<div class="mo"><div class="ml"><span>'+esc(m)+'</span><i>'+(i+1)+' / '+f.items.length+'</i></div><div class="mr"><input type="time" data-id="'+b+'t" aria-label="'+esc(m)+' time"><button type="button" class="now" data-now="'+b+'t">Now</button><input type="text" data-id="'+b+'n" placeholder="Note" aria-label="'+esc(m)+' note" autocomplete="off"></div></div>'; }).join(""); }
+function fRepeat(f){ var h=''; for(var i=0;i<REPMAX[f.id];i++){ var b=f.id+i+"_"; h+='<div class="card rep" data-rep="'+f.id+'" data-i="'+i+'"><div class="ct">'+esc(f.title)+' '+(i+1)+'</div>'+f.fields.map(function(sf){ return render(sf,b); }).join("")+'</div>'; } return h+'<button type="button" class="btn small" data-add="'+f.id+'">+ '+esc(f.add)+'</button>'; }
+function fWords(f,id){ return '<div class="f"><span class="lab'+(f.q?' q':'')+'">'+esc(f.label)+'</span><div class="row3">'+[1,2,3].map(function(n){ return '<input type="text" data-id="'+id+n+'" aria-label="Word '+n+'" autocomplete="off" autocapitalize="none">'; }).join("")+'</div></div>'; }
+function fRecall(f){ return '<div class="f"><span class="lab">'+esc(f.label)+'</span><div class="recall" data-recall="'+f.from+'"></div></div>'; }
+function fPhoto(f,id){
+  SLOTMETA[id]={label:f.label,max:f.max||3,cap:!!f.cap}; SLOTSEC[id]=curSec;
+  return '<div class="f"><span class="lab">Photos — '+esc(f.label)+'</span><div class="ph" data-slot="'+id+'"><div class="thumbs'+(f.cap?' list':'')+'"></div><label class="addph"><input type="file" accept="image/*" multiple data-ph="'+id+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3.5l2-3h5l2 3H20v11H4z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span>Add photo</span></label><div class="busy" hidden></div></div></div>';
+}
+
+function render(f,pfx){
+  var id=pfx+(f.id||"");
+  switch(f.t){
+    case "rules": return '<ol class="rules">'+f.items.map(function(r,i){ return '<li><b>'+(i+1)+'</b><span>'+esc(r)+'</span></li>'; }).join("")+'</ol>';
+    case "note": return '<p class="note">'+esc(f.text)+'</p>';
+    case "row": return '<div class="row">'+f.fields.map(function(x){ return render(x,pfx); }).join("")+'</div>';
+    case "text": return fText(f,id);
+    case "area": return fArea(f,id);
+    case "date": return fDate(f,id);
+    case "time": return fTime(f,id);
+    case "num": return fNum(f,id);
+    case "checks": return fChecks(f,pfx);
+    case "single": return fSingle(f,id);
+    case "rate": return fRate(f,id);
+    case "zones": return fZones(f);
+    case "clock": return fClock(f);
+    case "repeat": return fRepeat(f);
+    case "words3": return fWords(f,id);
+    case "recall": return fRecall(f);
+    case "photo": return fPhoto(f,id);
+    case "pcl": return '<ul class="miss" id="pcl"></ul>';
+  }
+  return "";
+}
+
+function sendHTML(){
+  return '<div class="g"><div class="gh"><h2>WHERE YOU’RE <b>UP TO</b></h2><div class="note-r">Tap a section above to finish it</div></div><ul class="miss" id="miss"></ul></div>'+
+  '<div class="sendbox"><h3>SEND IT IN</h3><ol class="steps">'+
+  '<li>Tap <b>Send the report</b>. Your phone’s share sheet opens with the PDF attached — every answer and photo in place.</li>'+
+  '<li>Choose <b>Mail</b> (or Gmail). Long-press the <b>To</b> field and <b>Paste</b> — the address is already copied for you.</li>'+
+  '<li>Send it to <span class="addr">'+TO+'</span></li></ol>'+
+  '<div class="stack"><button type="button" class="btn red" id="sendbtn" disabled>Preparing your PDF…</button><div class="note" id="pdfmsg" hidden></div></div>'+
+  '<details class="alt" id="alt"><summary>No share sheet on your phone? Do it in two steps</summary><div class="stack"><button type="button" class="btn small" id="pdfbtn" disabled>Preparing your PDF…</button><a class="btn small" id="mailbtn" href="#send">Open email app with the text report</a><button type="button" class="btn small" id="copybtn">Copy the report text</button><button type="button" class="btn small" id="addrbtn">Copy the email address</button></div><p class="note mt">Save the PDF, open the email, attach the PDF from Downloads (the Files app on iPhone), send.</p></details></div>'+
+  '<div class="g"><div class="gh"><h2>YOUR <b>PHOTOS</b></h2><div class="note-r">Each one carries its own caption</div></div><p class="note">If the PDF won’t save on your phone: long-press each photo, choose Save to Photos (or Download image), then attach them from your Photos app.</p><div id="gal"></div></div>'+
+  '<div class="g"><div class="gh"><h2>YOUR <b>REPORT</b></h2><div class="note-r">If copying fails, select this text and copy it yourself</div></div><textarea id="report" readonly aria-label="Your report"></textarea></div>'+
+  '<div class="g"><div class="gh"><h2>START <b>AGAIN</b></h2></div><p class="note">Clears every answer and photo saved on this phone. Only do this after your report has been sent.</p><button type="button" class="btn small" id="clearbtn">Clear this form</button></div>';
+}
+
+function renderSection(s,idx){
+  curSec=s.id;
+  var h='<section id="s_'+s.id+'" data-sec="'+s.id+'" hidden>';
+  h+='<h1 class="h1">'+(s.num?'<b>'+s.num+'</b>':'')+esc(s.title)+'</h1>';
+  if(s.lead) h+='<div class="lead">'+esc(s.lead)+'</div>';
+  h+='<div class="rule"></div>';
+  if(s.id==="start") h+='<div class="dn"><span class="lab">Your diner number</span><b>'+esc(CODE)+'</b><p class="note">This number is yours alone — it ties your report to you, so please don’t pass the link on. It’s printed on your report and on every photo.</p></div>';
+  if(s.send){ h+=sendHTML(); }
+  else { s.groups.forEach(function(g){ h+='<div class="g"><div class="gh"><h2>'+esc(g.h)+(g.r?' <b>'+esc(g.r)+'</b>':'')+'</h2>'+(g.note?'<div class="note-r">'+esc(g.note)+'</div>':'')+'</div>'+g.fields.map(function(f){ return render(f,""); }).join("")+'</div>'; }); }
+  h+='<div class="nav">'+(idx>0?'<button type="button" class="btn" data-go="'+SECTIONS[idx-1].id+'">← '+esc(SECTIONS[idx-1].tab)+'</button>':'')+(idx<SECTIONS.length-1?'<button type="button" class="btn solid" data-go="'+SECTIONS[idx+1].id+'">'+esc(SECTIONS[idx+1].tab)+' →</button>':'')+'</div>';
+  h+='<div class="saved"></div>';
+  h+='<div class="conf"><span>Confidential — head office only</span><span>Third Wave BBQ · Gold Coast</span></div>';
+  return h+'</section>';
+}
+
+function build(){
+  $("#sub").innerHTML='Surfers Paradise<br><b>'+esc(CODE)+'</b>';
+  $("#strip").innerHTML=SECTIONS.map(function(s){ return '<button type="button" class="tab" role="tab" aria-selected="false" data-go="'+s.id+'">'+esc(s.tab)+'<i class="dot"></i></button>'; }).join("");
+  $("#main").innerHTML=SECTIONS.map(renderSection).join("");
+  restore();
+  refresh();
+  var hsh=(location.hash||"").replace("#","");
+  if(SECTIONS.some(function(s){ return s.id===hsh; })) cur=hsh;
+  show(cur,true);
+  idbAll().then(function(recs){
+    (recs||[]).sort(function(a,b){ return a.at-b.at; }).forEach(function(r){ if(!SLOTMETA[r.slot]||r.code!==CODE) return; (P[r.slot]=P[r.slot]||[]).push(r); var m=/^f(\d+)_ph$/.exec(r.slot); if(m) shown.f=Math.max(shown.f,+m[1]+1); });
+    restoreReps(); renderAllSlots(); refresh(); if(cur==="verdict") renderPcl(); if(cur==="send") buildSend();
+  },function(){ toast("Photos can’t be stored on this phone in this browser — they will still go into the PDF while the page stays open"); });
+}
+
+/* ---------- state <-> DOM ---------- */
+function restore(){
+  $$("[data-id]").forEach(function(el){
+    var v=S[el.dataset.id];
+    if(el.type==="checkbox"){ el.checked=v===true; }
+    else if(el.type==="radio"){ el.checked=(v!=null&&String(v)===el.value); el.closest("label").classList.toggle("on",el.checked); }
+    else { el.value=v==null?"":v; }
+  });
+  $$(".rep").forEach(function(r){ var k=r.dataset.rep,i=+r.dataset.i; var has=$$("[data-id]",r).some(function(e){ var v=S[e.dataset.id]; return v===true||(typeof v==="string"&&v.trim()!==""); }); if(has) shown[k]=Math.max(shown[k],i+1); });
+  restoreReps();
+  $$("textarea").forEach(grow);
+  dayHint();
+}
+function restoreReps(){
+  $$(".rep").forEach(function(r){ r.hidden=(+r.dataset.i)>=shown[r.dataset.rep]; });
+  $$("[data-add]").forEach(function(b){ b.hidden=shown[b.dataset.add]>=REPMAX[b.dataset.add]; });
+}
+function grow(el){ el.style.height="auto"; el.style.height=Math.max(88,el.scrollHeight+2)+"px"; }
+function dayHint(){ var h=$("#h_v_date"); if(!h) return; var d=fmtDate(S.v_date,{weekday:"long"}); h.textContent=d?d:""; }
+function refreshRecall(){ $$("[data-recall]").forEach(function(el){ var v=(S[el.dataset.recall]||"").trim(); el.textContent=v||"(you left this blank on the Online page)"; }); }
+
+function stats(){
+  var out=[];
+  SECTIONS.forEach(function(s){
+    if(s.send) return;
+    var sec=$("#s_"+s.id), items={}, order=[];
+    function mark(key,ans){ if(!(key in items)){ items[key]=false; order.push(key); } items[key]=items[key]||ans; }
+    $$("[data-id]",sec).forEach(function(e){
+      var rep=e.closest(".rep"); if(rep&&rep.hidden) return;
+      var g=e.closest(".cks"); var key=g?"grp:"+g.dataset.grp:e.dataset.id;
+      var v=S[e.dataset.id]; mark(key,v===true||(typeof v==="string"&&v.trim()!==""));
+    });
+    $$(".ph[data-slot]",sec).forEach(function(e){ var rep=e.closest(".rep"); if(rep&&rep.hidden) return; mark("ph:"+e.dataset.slot,(P[e.dataset.slot]||[]).length>0); });
+    var a=0; order.forEach(function(k){ if(items[k]) a++; });
+    out.push({id:s.id,tab:s.tab,title:s.title,a:a,n:order.length});
+  });
+  return out;
+}
+function refresh(){
+  var st=stats(), A=0, N=0;
+  st.forEach(function(x){ A+=x.a; N+=x.n; var t=$('.tab[data-go="'+x.id+'"]'); if(t) t.classList.toggle("has",x.a>0); });
+  $("#prog").style.width=(N?Math.round(100*A/N):0)+"%";
+}
+
+function show(id,noSave){
+  cur=id;
+  $$("main section").forEach(function(el){ el.hidden=el.dataset.sec!==id; });
+  $$(".tab").forEach(function(t){ var on=t.dataset.go===id; t.setAttribute("aria-selected",on?"true":"false"); if(on){ try{ t.scrollIntoView({block:"nearest",inline:"center"}); }catch(e){} } });
+  refreshRecall();
+  if(id==="verdict") renderPcl();
+  if(id==="send") buildSend();
+  window.scrollTo(0,0);
+  if(!noSave) save();
+}
+
+/* ---------- report text ---------- */
+function fmtDate(iso,opt){ if(!iso) return ""; var d=new Date(iso+"T12:00:00"); if(isNaN(d)) return iso; return d.toLocaleDateString("en-AU",opt||{weekday:"short",day:"numeric",month:"short",year:"numeric"}); }
+function lab(f){ return String(f.label||"").replace(/\s*:\s*$/,""); }
+function sval(id){ var v=S[id]; return typeof v==="string"?v.trim():""; }
+function repHas(f,bp){ var any=false; f.fields.forEach(function(sf){ if(sf.t==="checks"){ sf.items.forEach(function(it){ if(S[bp+it[0]]===true) any=true; }); } else if(sf.t==="photo"){ if((P[bp+sf.id]||[]).length) any=true; } else if(sval(bp+sf.id)) any=true; }); return any; }
+function rep(f,pfx,L){
+  var id=pfx+(f.id||""), v;
+  switch(f.t){
+    case "row": f.fields.forEach(function(x){ rep(x,pfx,L); }); break;
+    case "text": L.push(lab(f)+": "+(sval(id)?(f.quote?"“"+sval(id)+"”":sval(id)):"—")); break;
+    case "area": v=sval(id); if(v.indexOf("\n")<0){ L.push(lab(f)+": "+(v||"—")); } else { L.push(lab(f)+":"); v.split("\n").forEach(function(x){ L.push("    "+x); }); } break;
+    case "date": L.push(lab(f)+": "+(fmtDate(sval(id))||"—")); break;
+    case "time": L.push(lab(f)+": "+(sval(id)||"—")); break;
+    case "num": v=sval(id); L.push(lab(f)+": "+(v?(f.pre||"")+v+(f.suf?" "+f.suf:""):"—")); break;
+    case "checks": f.items.forEach(function(it){ L.push((S[pfx+it[0]]===true?"[x] ":"[ ] ")+it[1]); }); break;
+    case "single": L.push((lab(f)||"Answer")+": "+(sval(id)||"—")); break;
+    case "rate": v=sval(id); L.push(lab(f)+": "+(v?v+"/"+(f.max||5):"—")); break;
+    case "words3": v=[1,2,3].map(function(n){ return sval(id+n); }).filter(Boolean); L.push(lab(f)+": "+(v.length?v.join(", "):"—")); break;
+    case "zones": f.items.forEach(function(z,i){ var b=f.id+i+"_"; L.push(z+": clean "+(sval(b+"clean")||"—")+"/5 · condition "+(sval(b+"cond")||"—")+"/5"+(sval(b+"note")?" · "+sval(b+"note"):"")); }); break;
+    case "clock": f.items.forEach(function(m,i){ var b=f.id+i+"_"; var t=sval(b+"t")||" — "; while(t.length<6) t+=" "; L.push(t+" "+m+(sval(b+"n")?"  — "+sval(b+"n"):"")); }); break;
+    case "photo": v=(P[id]||[]).length; L.push("Photos — "+slotLabel(id)+": "+(v?v+" in the PDF":"none")); break;
+    case "repeat":
+      for(var i=0;i<shown[f.id];i++){
+        var b=f.id+i+"_"; if(!repHas(f,b)) continue;
+        var sub=[]; f.fields.forEach(function(sf){ rep(sf,b,sub); });
+        L.push(f.title+" "+(i+1)+":"); sub.forEach(function(x){ L.push("    "+x); });
+      }
+      break;
+  }
+}
+function report(){
+  var L=[];
+  L.push("THIRD WAVE BBQ — MYSTERY DINER REPORT");
+  L.push("Gold Coast · Surfers Paradise");
+  L.push("Diner number: "+CODE);
+  L.push("Sent: "+new Date().toLocaleString("en-AU",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}));
+  L.push("Photos: "+photoCount()+" (in the attached PDF)");
+  L.push("");
+  SECTIONS.forEach(function(s){
+    if(s.send) return;
+    if(s.id!=="start"){ L.push("============================================"); L.push(s.num+"  "+s.title); L.push("============================================"); }
+    s.groups.forEach(function(g){ if(g.fields.every(function(f){ return f.t==="pcl"||f.t==="rules"||f.t==="note"; })) return; L.push(""); L.push("-- "+g.h+(g.r?" "+g.r:"")+" --"); g.fields.forEach(function(f){ rep(f,"",L); }); });
+    L.push("");
+  });
+  L.push("Sent from the Third Wave BBQ mystery diner form.");
+  return L.join("\n");
+}
+function subject(){ var d=fmtDate(sval("v_date"),{day:"numeric",month:"short",year:"numeric"}); return "Mystery Diner report — "+CODE+" — Surfers Paradise — "+(d||"date not given")+" — "+(sval("d_name")||"name not given"); }
+function pdfName(){ var d=fmtDate(sval("v_date"),{day:"numeric",month:"short",year:"numeric"}); return ("Mystery Diner "+CODE+" - "+(d||"undated")+(sval("d_name")?" - "+sval("d_name"):"")).replace(/[^\w .-]+/g,"").replace(/\s+/g," ").trim()+".pdf"; }
+function galleryHTML(){
+  var items=[];
+  allSlots().forEach(function(s){ var list=P[s.id]||[]; list.forEach(function(r,i){ items.push({r:r,cap:s.label+(list.length>1?" ("+(i+1)+" of "+list.length+")":"")+(r.cap?" — "+r.cap:"")}); }); });
+  if(!items.length) return '<p class="note">No photos added yet.</p>';
+  return '<div class="gal">'+items.map(function(it){ return '<figure><img src="'+objUrl(it.r)+'" alt=""><figcaption>'+esc(it.cap)+'</figcaption></figure>'; }).join("")+'</div>';
+}
+function buildSend(){
+  var r=report(), ta=$("#report");
+  ta.value=r;
+  $("#mailbtn").setAttribute("href","mailto:"+TO+"?subject="+encodeURIComponent(subject())+"&body="+encodeURIComponent(r));
+  $("#miss").innerHTML=stats().map(function(x){ var ok=x.n>0&&x.a===x.n; return '<li'+(ok?' class="ok"':'')+'><span>'+esc(x.tab)+' — '+esc(x.title)+'</span><span>'+(ok?'complete':x.a+' of '+x.n)+'</span></li>'; }).join("");
+  $("#gal").innerHTML=galleryHTML();
+  prepPdf();
+}
+
+/* ---------- PDF ---------- */
+function clean(s){ return String(s==null?"":s).replace(/\s*—\s*/g," - ").replace(/–/g,"-").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/…/g,"...").replace(/\s*·\s*/g," - ").replace(/→/g,"->").replace(/←/g,"<-").replace(/×/g,"x"); }
+function blobToDataURL(b){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){ res(r.result); }; r.onerror=function(){ rej(r.error); }; r.readAsDataURL(b); }); }
+function buildPdf(){
+  var J=window.jspdf&&window.jspdf.jsPDF; if(!J) return Promise.reject(new Error("nolib"));
+  var doc=new J({unit:"mm",format:"a4",compress:true});
+  var PW=210,PH=297,M=14,CW=PW-2*M,y=M,page=1;
+  var INK=[18,16,24],RED=[192,57,43],GREY=[107,101,92],LINE=[200,192,178],PAPER=[251,249,245];
+  var LH=function(size){ return size*0.3528*1.3; };
+  function footer(){ setf(7,"bold",GREY); doc.text("CONFIDENTIAL - HEAD OFFICE ONLY",M,PH-9); doc.text("THIRD WAVE BBQ - GOLD COAST - PAGE "+page,PW-M,PH-9,{align:"right"}); }
+  function need(h){ if(y+h>PH-16){ footer(); doc.addPage(); page++; y=M; } }
+  function setf(size,style,col){ doc.setFont("helvetica",style||"normal"); doc.setFontSize(size); var c=col||INK; doc.setTextColor(c[0],c[1],c[2]); }
+  function txt(s,size,style,col,x,w){ setf(size,style,col); var lines=doc.splitTextToSize(clean(s),w||CW); var lh=LH(size); for(var i=0;i<lines.length;i++){ need(lh); doc.text(lines[i],x||M,y+size*0.3528*0.78); y+=lh; } }
+  function rule(w,col){ need(2); var c=col||INK; doc.setDrawColor(c[0],c[1],c[2]); doc.setLineWidth(w||0.4); doc.line(M,y,PW-M,y); y+=2; }
+  function label(s){ txt(String(s).toUpperCase(),6.8,"bold",GREY); }
+  function qa(l,v){ need(10); label(l); txt(v||"-",10,"normal",INK); y+=1.5; }
+  function box(on,l){
+    need(6); doc.setLineWidth(0.35);
+    if(on){ doc.setFillColor(RED[0],RED[1],RED[2]); doc.setDrawColor(RED[0],RED[1],RED[2]); doc.rect(M,y+0.5,3.4,3.4,"FD"); doc.setDrawColor(255,255,255); doc.setLineWidth(0.5); doc.line(M+0.8,y+2.3,M+1.5,y+3.1); doc.line(M+1.5,y+3.1,M+2.8,y+1.3); }
+    else { doc.setDrawColor(INK[0],INK[1],INK[2]); doc.rect(M,y+0.5,3.4,3.4,"S"); }
+    setf(9.5,"normal",INK); var lines=doc.splitTextToSize(clean(l),CW-6); doc.text(lines,M+5.5,y+3.2); y+=Math.max(1,lines.length)*LH(9.5)+0.6;
+  }
+  function rateRow(l,v,n){
+    need(13); label(l); var x=M;
+    for(var i=1;i<=n;i++){ var on=String(v)===String(i); doc.setLineWidth(0.35);
+      if(on){ doc.setFillColor(INK[0],INK[1],INK[2]); doc.setDrawColor(INK[0],INK[1],INK[2]); doc.circle(x+2.4,y+2.4,2.4,"FD"); setf(7,"bold",PAPER); }
+      else { doc.setDrawColor(INK[0],INK[1],INK[2]); doc.circle(x+2.4,y+2.4,2.4,"S"); setf(7,"bold",INK); }
+      doc.text(String(i),x+2.4,y+3.3,{align:"center"}); x+=6.8; }
+    y+=7.5;
+  }
+  function image(rec,cap){
+    var sc=Math.min(CW/rec.w,110/rec.h), w=rec.w*sc, h=rec.h*sc;
+    return blobToDataURL(rec.blob).then(function(d){ need(h+9); doc.addImage(d,"JPEG",M,y,w,h); y+=h+1.2; txt(cap,7.5,"normal",GREY); y+=2.5; });
+  }
+  function photos(id,l){
+    var list=P[id]||[]; if(!list.length){ qa("Photos - "+l,"none"); return Promise.resolve(); }
+    var ch=Promise.resolve(); list.forEach(function(r,i){ ch=ch.then(function(){ return image(r,l+(list.length>1?" ("+(i+1)+" of "+list.length+")":"")+(r.cap?" - "+r.cap:"")); }); }); return ch;
+  }
+  function pf(f,pfx){
+    var id=pfx+(f.id||""), v, ch;
+    switch(f.t){
+      case "row": ch=Promise.resolve(); f.fields.forEach(function(x){ ch=ch.then(function(){ return pf(x,pfx); }); }); return ch;
+      case "text": qa(lab(f),sval(id)?(f.quote?'"'+sval(id)+'"':sval(id)):""); break;
+      case "area": qa(lab(f),sval(id)); break;
+      case "date": qa(lab(f),fmtDate(sval(id))); break;
+      case "time": qa(lab(f),sval(id)); break;
+      case "num": v=sval(id); qa(lab(f),v?(f.pre||"")+v+(f.suf?" "+f.suf:""):""); break;
+      case "checks": f.items.forEach(function(it){ box(S[pfx+it[0]]===true,it[1]); }); y+=1.5; break;
+      case "single": qa(lab(f)||"Answer",sval(id)); break;
+      case "rate": rateRow(lab(f),sval(id),f.max||5); break;
+      case "words3": v=[1,2,3].map(function(n){ return sval(id+n); }).filter(Boolean); qa(lab(f),v.join(", ")); break;
+      case "zones": f.items.forEach(function(z,i){ var b=f.id+i+"_"; need(14); txt(z,9.5,"bold",INK); txt("Clean "+(sval(b+"clean")||"-")+"/5     Condition "+(sval(b+"cond")||"-")+"/5"+(sval(b+"note")?"     "+sval(b+"note"):""),9,"normal",INK); y+=1; }); break;
+      case "clock": f.items.forEach(function(m,i){ var b=f.id+i+"_"; need(6); setf(9.5,"bold",INK); doc.text(sval(b+"t")||"  -  ",M,y+3.3); setf(9.5,"normal",INK); doc.text(clean(m),M+16,y+3.3); var nl=doc.splitTextToSize(clean(sval(b+"n")),CW-66); setf(9,"normal",GREY); if(nl.length&&nl[0]) doc.text(nl,M+66,y+3.3); y+=Math.max(1,nl.length)*LH(9.5)+0.4; }); break;
+      case "repeat":
+        ch=Promise.resolve();
+        for(var r=0;r<shown[f.id];r++){ (function(r){ var bp=f.id+r+"_"; if(!repHas(f,bp)) return; ch=ch.then(function(){ need(16); txt(f.title+" "+(r+1),11,"bold",RED); var c2=Promise.resolve(); f.fields.forEach(function(sf){ c2=c2.then(function(){ return pf(sf,bp); }); }); return c2.then(function(){ y+=2; }); }); })(r); }
+        return ch;
+      case "photo": return photos(id,slotLabel(id));
+    }
+    return Promise.resolve();
+  }
+  need(30); doc.setFillColor(INK[0],INK[1],INK[2]); doc.rect(M,y,44,9,"F"); setf(10,"bold",PAPER); doc.text("THIRD WAVE BBQ",M+22,y+6.1,{align:"center"}); setf(16,"bold",RED); doc.text("DINER "+CODE,PW-M,y+6.8,{align:"right"}); y+=13;
+  txt("MYSTERY DINER REPORT",26,"bold",INK);
+  txt("Diner "+CODE+"  |  Gold Coast - Surfers Paradise  |  "+(fmtDate(sval("v_date"))||"date not given")+"  |  "+(sval("d_name")||"name not given")+"  |  built "+new Date().toLocaleString("en-AU",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"}),9,"bold",GREY);
+  rule(0.9); y+=3;
+  var chain=Promise.resolve();
+  SECTIONS.forEach(function(s){
+    if(s.send) return;
+    chain=chain.then(function(){
+      if(s.id!=="start"){ need(24); setf(17,"bold",RED); doc.text(s.num,M,y+5); setf(17,"bold",INK); doc.text(clean(s.title),M+12,y+5); y+=8; rule(0.7); y+=2; }
+      var c=Promise.resolve();
+      s.groups.forEach(function(g){ if(g.fields.every(function(f){ return f.t==="pcl"||f.t==="recall"||f.t==="rules"||f.t==="note"; })) return; c=c.then(function(){ need(16); txt(g.h+(g.r?" "+g.r:""),11,"bold",INK); rule(0.25,LINE); y+=1; var c2=Promise.resolve(); g.fields.forEach(function(f){ c2=c2.then(function(){ return pf(f,""); }); }); return c2.then(function(){ y+=3; }); }); });
+      return c.then(function(){ y+=4; });
+    });
+  });
+  return chain.then(function(){ footer(); return doc.output("blob"); });
+}
+function mb(b){ return (b.size/1048576).toFixed(1)+" MB"; }
+function openAlt(){ var d=$("#alt"); if(d) d.open=true; }
+function prepPdf(){
+  var b1=$("#sendbtn"), b2=$("#pdfbtn"), msg=$("#pdfmsg"); if(!b1) return;
+  function setBtns(dis,t1,t2){ b1.disabled=dis; b1.textContent=t1; if(b2){ b2.disabled=dis; b2.textContent=t2; } }
+  function fail(t){ pdfBuilding=false; b1.hidden=true; if(b2) b2.hidden=true; msg.hidden=false; msg.textContent=t; openAlt(); }
+  if(!(window.jspdf&&window.jspdf.jsPDF)){ fail("The PDF maker didn’t load on this connection. Use Open email app for the text and attach the photos from the gallery below."); return; }
+  if(pdfBlob){ setBtns(false,"Send the report ("+mb(pdfBlob)+")","Save the PDF ("+mb(pdfBlob)+")"); return; }
+  if(pdfBuilding) return;
+  pdfBuilding=true; setBtns(true,"Preparing your PDF…","Preparing your PDF…"); msg.hidden=true;
+  buildPdf().then(function(b){ pdfBlob=b; pdfBuilding=false; b1.hidden=false; if(b2) b2.hidden=false; setBtns(false,"Send the report ("+mb(b)+")","Save the PDF ("+mb(b)+")"); },function(e){ fail("Couldn’t build the PDF on this phone. Use Open email app for the text and attach the photos from the gallery below."); });
+}
+function sendReport(){
+  if(!pdfBlob){ prepPdf(); toast("Still preparing the PDF — one moment."); return; }
+  copy(TO);
+  var name=pdfName(), file=null;
+  try{ file=new File([pdfBlob],name,{type:"application/pdf"}); }catch(e){}
+  if(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:subject(),text:"To: "+TO+"\n\n"+report()}).then(function(){ toast("Handed to your email app. Paste the address into To and send."); },function(e){ if(e&&e.name==="AbortError"){ toast("Cancelled — tap Send the report when you’re ready."); } else { openAlt(); toast("The share sheet didn’t work here — use the two-step way below."); } });
+    return;
+  }
+  openAlt(); savePdf(); toast("No share sheet on this device — saving the PDF. Then tap Open email app below and attach it.");
+}
+function savePdf(){
+  if(!pdfBlob){ prepPdf(); return; }
+  var name=pdfName();
+  if(DL){
+    DL.save({filename:name,data:pdfBlob}).then(function(){ toast("PDF saved. Now open your email app and attach it from Downloads."); },function(e){
+      var c=e&&e.code;
+      if(c==="declined") toast("Not saved — tap again when ready.");
+      else if(c==="rate_limited") toast("One moment, then tap again.");
+      else plainDownload(name);
+    });
+  } else plainDownload(name);
+}
+function plainDownload(name){
+  try{ var u=URL.createObjectURL(pdfBlob); var a=document.createElement("a"); a.href=u; a.download=name; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(u); },60000);
+    toast("PDF saved to Downloads. If it didn’t save, use the photos below: long-press each one and save it."); }
+  catch(e){ toast("Couldn’t save the PDF here. Use the photos below instead."); }
+}
+
+/* ---------- clipboard ---------- */
+function fallbackCopy(t){
+  try{
+    var ta=document.createElement("textarea"); ta.value=t; ta.setAttribute("readonly",""); ta.style.cssText="position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;font-size:16px";
+    document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0,t.length);
+    var ok=document.execCommand("copy"); document.body.removeChild(ta); return !!ok;
+  }catch(e){ return false; }
+}
+function copy(t){
+  return new Promise(function(res){
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ res(true); },function(){ res(fallbackCopy(t)); }); }
+    else res(fallbackCopy(t));
+  });
+}
+var toastT=null;
+function toast(m){ var t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){ t.classList.remove("show"); },3200); }
+
+/* ---------- events ---------- */
+document.addEventListener("input",function(e){
+  var el=e.target; if(!el.dataset) return;
+  if(el.dataset.cap){ setCap(el.dataset.cap,el.value); return; }
+  if(el.dataset.id==null) return;
+  if(el.type==="checkbox"||el.type==="radio") return;
+  S[el.dataset.id]=el.value;
+  if(el.tagName==="TEXTAREA") grow(el);
+  if(el.dataset.id==="v_date") dayHint();
+  save();
+});
+document.addEventListener("change",function(e){
+  var el=e.target; if(!el.dataset) return;
+  if(el.type==="file"){ var slot=el.dataset.ph, files=Array.prototype.slice.call(el.files||[]); el.value=""; if(slot&&files.length) addPhotos(slot,files); return; }
+  if(el.dataset.id==null) return;
+  var id=el.dataset.id;
+  if(el.type==="checkbox"){ S[id]=el.checked; }
+  else if(el.type==="radio"){ if(el.checked){ S[id]=el.value; $$('input[name="'+el.name+'"]').forEach(function(r){ r.closest("label").classList.toggle("on",r.checked); }); } }
+  else { S[id]=el.value; if(id==="v_date") dayHint(); }
+  save();
+});
+document.addEventListener("click",function(e){
+  if(e.target.closest("#lb")){ $("#lb").hidden=true; return; }
+  var lb=e.target.closest("label.chip, .rate label");
+  if(lb){ var r=lb.querySelector('input[type="radio"]'); if(r&&r.checked){ e.preventDefault(); r.checked=false; delete S[r.dataset.id]; lb.classList.remove("on"); save(); } return; }
+  var b=e.target.closest("[data-now],[data-add],[data-go],[data-del],[data-view],#copybtn,#addrbtn,#clearbtn,#mailbtn,#pdfbtn,#sendbtn");
+  if(!b) return;
+  if(b.dataset.now){
+    var inp=$('[data-id="'+b.dataset.now+'"]'); var d=new Date();
+    var v=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+    inp.value=v; S[b.dataset.now]=v; save(); toast("Stamped "+v);
+  } else if(b.dataset.add){
+    var k=b.dataset.add; shown[k]=Math.min(REPMAX[k],shown[k]+1); restoreReps(); save();
+    var card=$('.rep[data-rep="'+k+'"][data-i="'+(shown[k]-1)+'"]'); if(card){ var first=$("input[type=text]",card); if(first) first.focus(); }
+  } else if(b.dataset.go){
+    show(b.dataset.go);
+  } else if(b.dataset.del){
+    removePhoto(b.dataset.del);
+  } else if(b.dataset.view){
+    var rec=findRec(b.dataset.view); if(rec){ $("#lb img").src=objUrl(rec); $("#lb").hidden=false; }
+  } else if(b.id==="sendbtn"){
+    sendReport();
+  } else if(b.id==="pdfbtn"){
+    savePdf();
+  } else if(b.id==="copybtn"){
+    copy(report()).then(function(ok){ toast(ok?"Report text copied.":"Couldn’t copy. Select the report text below and copy it yourself."); });
+  } else if(b.id==="mailbtn"){
+    copy(report()).then(function(ok){ toast(ok?"Report text copied too. If it isn’t in the email, paste it. Then attach the PDF.":"If your email app didn’t open, copy the report below and email it with the PDF."); });
+  } else if(b.id==="addrbtn"){
+    copy(TO).then(function(ok){ toast(ok?"Address copied: "+TO:"Address: "+TO); });
+  } else if(b.id==="clearbtn"){
+    if(!clearArmed){ clearArmed=true; b.textContent="Tap again to clear everything"; b.classList.add("red"); setTimeout(function(){ clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); },4000); }
+    else { try{ localStorage.removeItem(skey()); }catch(e2){} idbClear().catch(function(){}); S={}; P={}; shown={p:4,f:4}; pdfBlob=null; clearArmed=false; b.textContent="Clear this form"; b.classList.remove("red"); restore(); renderAllSlots(); refresh(); show("start"); toast("Cleared"); }
+  }
+});
+
+/* ---------- boot ---------- */
+function start(data){
+  resolveCode();
+  if(!CODE){ renderGate(); return; }
+  load();
+  if(data&&data.S){ S=data.S; if(data.cur) cur=data.cur; if(data.shown){ shown.p=data.shown.p||4; shown.f=data.shown.f||4; } }
+  build();
+}
+try{ if(window.claude&&window.claude.use){ window.claude.use("downloads").then(function(ns){ DL=ns||null; },function(){ DL=null; }); } }catch(e){}
+try{ if(window.claude&&window.claude.hot&&window.claude.hot.snapshot){ window.claude.hot.snapshot(function(){ return {S:S,cur:cur,shown:shown}; }); } }catch(e){}
+if(window.claude&&window.claude.hot&&window.claude.hot.ready){ window.claude.hot.ready(start); } else { start(window.claude&&window.claude.hot?window.claude.hot.data:null); }
+})();
+</script>
+
+</body>
+</html>
