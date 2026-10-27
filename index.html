@@ -332,7 +332,6 @@ var SECTIONS=[
   {t:"photo",id:"ph_drinks",label:"Drinks",max:3}
  ]},
  {h:"VALUE",fields:[
-  {t:"num",id:"val_head",label:"Spend per head",pre:"$",mode:"decimal"},
   {t:"rate",id:"val_worth",label:"Worth it"}
  ]}
 ]},
@@ -774,7 +773,7 @@ function glance(){
   rows.push(["Room in three words", [1,2,3].map(function(n){ return sval("a_w"+n); }).filter(Boolean).join(", ")]);
   rows.push(["Fix first", sval("vd_fix")]);
   rows.push(["They nailed", sval("vd_nailed")]);
-  rows.push(["Spend", [money("v_spend")&&money("v_spend")+" total", money("val_head")&&money("val_head")+" per head"].filter(Boolean).join(", ")]);
+  rows.push(["Spend", money("v_spend")?money("v_spend")+" total":""]);
   rows.push(["Food", DISHES.map(function(d,i){ var b="f"+i+"_"; if(!sval(b+"name")&&!sval(b+"taste")) return ""; return d+": "+(sval(b+"name")||"")+" (taste "+(r5(b+"taste")||"-")+", portion "+(r5(b+"portion")||"-")+", would order again "+(sval(b+"again")||"-")+")"; }).filter(Boolean).join("; ")]);
   rows.push(["The clock", [k(0)&&"drinks ordered "+k(0), k(1)&&"drinks on table "+k(1)+(g1!==null?" ("+g1+" min)":""), k(2)&&"food ordered "+k(2), k(3)&&"starters "+k(3)+(g2!==null?" ("+g2+" min)":""), k(4)&&"mains "+k(4)+(g3!==null?" ("+g3+" min after ordering)":""), k(7)&&"paid and out "+k(7)].filter(Boolean).join(", ")]);
   rows.push(["Check-back on the food", sval("k5_y")]);
